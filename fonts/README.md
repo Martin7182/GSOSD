@@ -36,4 +36,4 @@ A new font file is simply a GSOSD script consisting of 256 SET_FONT instructions
 - Optionally, define window borders and logo (see above).  
 - Save the image in native format (so that you can edit it later if needed).  
 - Save the image in gif layout.  
-- Run gif2osd.php <gif-file>. The output is plain text that can be processed directly by GSOSD.  
+- Run gif2osd.php \<gif-file\>. The output is plain text that can be processed directly by GSOSD.  

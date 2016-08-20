@@ -104,12 +104,12 @@ This does a soft reset as described in the Max7456 manual. In short, it sets all
 **CLEARPART**  
 Purpose	: 	Clear part of the screen.  
 Arguments :  
-*<x-coordinate>* (integer)  
-*<y-coordinate>* (integer)  
-*<width>* (integer)  
-*<height>* (integer)  
+*x-coordinate* (integer)  
+*y-coordinate* (integer)  
+*width* (integer)  
+*height* (integer)  
 
-This clears (a portion of) the screen. <x-coorinates> is between 0 and 29 for both PAL and NTSC. <y-coordinate> is between 0 and 15 for PAL and between 0 and 12 for NTSC. Fox <x-coorindate> smaller than 0, the value taken will be 0. Likewise for <y-coorindate>. For <width> smaller than 0, max-width will be taken. Likewise for <height>.
+This clears (a portion of) the screen. *x-coorinate* is between 0 and 29 for both PAL and NTSC. *y-coordinate* is between 0 and 15 for PAL and between 0 and 12 for NTSC. For *x-coorindate* smaller than 0, the value taken will be 0. Likewise for *y-coorindate*. For *width* smaller than 0, max-width will be taken. Likewise for *height*.
 
 Examples :  
 `CLEARPART 9 5 12 2`	// Clear the LOGO at startup  
@@ -160,9 +160,9 @@ This makes configuration & register changes permanent by storing them into eepro
 
 **HOS**  
 Purpose	: 	Adjust horizontal offset.  
-Arguments :	*<amount>* (integer)  
+Arguments :	*amount* (integer)  
 
-This shifts the OSD image horizontally by <amount> number of pixels. The OSD image can be shifted 32 pixels to the left and 31 pixels to the right. Absolute values:  
+This shifts the OSD image horizontally by *amount* number of pixels. The OSD image can be shifted 32 pixels to the left and 31 pixels to the right. Absolute values:  
 0  : -32 pixels  
 ...  
 32 : 0 pixels  
@@ -180,9 +180,9 @@ Examples :
 
 **VOS**  
 Purpose	: 	Adjust vertical offset.  
-Arguments :	*<amount>* (integer)  
+Arguments :	*amount* (integer)  
 
-This shifts the OSD image vertically by <amount> number of pixels. The OSD image can be shifted 16 pixels to the top and 15 pixels to the bottom. Absolute values:  
+This shifts the OSD image vertically by *amount* number of pixels. The OSD image can be shifted 16 pixels to the top and 15 pixels to the bottom. Absolute values:  
 0  : -16 pixels  
 ...  
 16 : 0 pixels  
@@ -200,9 +200,9 @@ Examples :
 
 **INSMUX1**  
 Purpose	: 	Adjust pixel sharpness "insmux1".  
-Arguments :	*<amount>* (integer)  
+Arguments :	*amount* (integer)  
 
-This controls the OSD Rise and Fall Time; typical transition times between adjacent OSD pixels. The current value is adjusted by <amount>. A lower value results in sharper pixels, but more cross-colour/cross-luma artefacts. A higher value does the opposite. Absolute values:  
+This controls the OSD Rise and Fall Time; typical transition times between adjacent OSD pixels. The current value is adjusted by *amount*. A lower value results in sharper pixels, but more cross-colour/cross-luma artefacts. A higher value does the opposite. Absolute values:  
 0 : 20ns  
 1 : 30ns  
 2 : 35ns  
@@ -222,9 +222,9 @@ Examples :
 
 **INSMUX2**  
 Purpose	: 	Adjust pixel sharpness "insmux2".  
-Arguments :	*<amount>* (integer)  
+Arguments :	*amount* (integer)  
 
-This controls the OSD Insertion Mux Switching Time; typical transition times between input video and OSD pixels. The current value is adjusted by <amount>. A lower value results in sharper pixels, but more cross-colour/cross-luma artefacts. A higher value does the opposite. Absolute values:  
+This controls the OSD Insertion Mux Switching Time; typical transition times between input video and OSD pixels. The current value is adjusted by *amount*. A lower value results in sharper pixels, but more cross-colour/cross-luma artefacts. A higher value does the opposite. Absolute values:  
 0 : 30ns  
 1 : 35ns  
 2 : 50ns  
@@ -245,10 +245,10 @@ Examples :
 **CBL**  
 Purpose	: 	Adjust character black level.  
 Arguments :  
-*<line>* (integer)  
-*<amount>* (integer)  
+*line* (integer)  
+*amount* (integer)  
 
-This setting controls the black pixel brightness. <line> is the line number to adjust, starting at 0. Any negative value means all lines. <amount> is the amount to adjust. Absolute values:  
+This setting controls the black pixel brightness. *line* is the line number to adjust, starting at 0. Any negative value means all lines. *amount* is the amount to adjust. Absolute values:  
 0 : 0%  
 1 : 10%  
 2 : 20%  
@@ -268,10 +268,10 @@ Examples :
 **CWL**  
 Purpose	: 	Adjust character white level.  
 Arguments :  
-*<line>* (integer)  
-*<amount>* (integer)  
+*line* (integer)  
+*amount* (integer)  
 
-This setting controls the white pixel brightness. <line> is the line number to adjust, starting at 0. Any negative value means all lines. <amount> is the amount to adjust. Absolute values:  
+This setting controls the white pixel brightness. *line* is the line number to adjust, starting at 0. Any negative value means all lines. *amount* is the amount to adjust. Absolute values:  
 0 : 120%  
 1 : 100%  
 2 : 90%  
@@ -291,12 +291,12 @@ Examples :
 **P_RAW**  
 Purpose	: 	Print raw data to screen.  
 Arguments :  
-*<x-coordinate>* (integer)  
-*<y-coordinate>* (integer)  
-*<length>* (integer)  
-*<data>* (string)  
+*x-coordinate* (integer)  
+*y-coordinate* (integer)  
+*length* (integer)  
+*data* (string)  
 
-This command prints raw data to screen at the position given by <x-coordinate> and <y-coordinate>. As soon as <length> number of <data> characters have been received or a NUL-byte ('\0') has been sent, processing ends. NUL-bytes are internally used to indicate empty screen positions, so this value cannot be used as displayable data anyway. A negative <length> means infinite for which case processing will stop upon a NUL-byte or by data timeout. See also the TIMEOUT command.
+This command prints raw data to screen at the position given by *x-coordinate* and *y-coordinate*. As soon as *length* number of *data* characters have been received or a NUL-byte ('\0') has been sent, processing ends. NUL-bytes are internally used to indicate empty screen positions, so this value cannot be used as displayable data anyway. A negative *length* means infinite for which case processing will stop upon a NUL-byte or by data timeout. See also the TIMEOUT command.
 
 Examples :  
 `P_RAW 9 5 12 Hello World!`	// print 12 characters in the middle of the screen  
@@ -307,14 +307,14 @@ Examples :
 **P_WINDOW**  
 Purpose	: 	Print data to scrolling viewport.  
 Arguments :  
-*<x-coordinate>* (integer)  
-*<y-coordinate>* (integer)  
-*<width>* (integer)  
-*<height>* (integer)  
-*<length>* (integer)  
-*<data>* (string)  
+*x-coordinate* (integer)  
+*y-coordinate* (integer)  
+*width* (integer)  
+*height* (integer)  
+*length* (integer)  
+*data* (string)  
 
-This command prints interpreted data to given view-port on the screen. The view-port is given by <x-coordinate>, <y-coordinate>, <width> and <height>. A negative <width> will cause borders to be drawn at left and right. Likewise for <height> at top and bottom. As soon as the window is full, it will scroll to the top, line by line. A carriage-return character (\x0D) will cause the remainder of current line to be filled with spaces. An implementation detail due to carriage-return handling is that the function starts writing data at the first empty position in the window. So if there is text already present, it will handled like it was just printed with this function. Like with P_RAW, <length> may be negative.
+This command prints interpreted data to given view-port on the screen. The view-port is given by *x-coordinate*, *y-coordinate*, *width* and *height*. A negative *width* will cause borders to be drawn at left and right. Likewise for *height* at top and bottom. As soon as the window is full, it will scroll to the top, line by line. A carriage-return character (\x0D) will cause the remainder of current line to be filled with spaces. An implementation detail due to carriage-return handling is that the function starts writing data at the first empty position in the window. So if there is text already present, it will handled like it was just printed with this function. Like with P_RAW, *length* may be negative.
 
 Examples :  
 `P_WINDOW 9 5 12 2 12 Hello\x0DWorld!`		// print two lines in a 12x2 window  
@@ -325,14 +325,14 @@ Examples :
 **P_BANNER**  
 Purpose	: 	Print data as scrolling banner.  
 Arguments :  
-*<x-coordinate>* (integer)  
-*<y-coordinate>* (integer)  
-*<width>* (integer)  
-*<height>* (integer)  
-*<length>* (integer)  
-*<data>* (string)  
+*x-coordinate* (integer)  
+*y-coordinate* (integer)  
+*width* (integer)  
+*height* (integer)  
+*length* (integer)  
+*data* (string)  
 
-This command prints data to screen as a scrolling banner. It works much like P_WINDOW, so it prints data to given view-port, shows borders on negative <width> and <height> and accepts negative <length>. Only the scrolling works different; it scrolls from right to left and from bottom to top, character by character.
+This command prints data to screen as a scrolling banner. It works much like P_WINDOW, so it prints data to given view-port, shows borders on negative *width* and *height* and accepts negative *length*. Only the scrolling works different; it scrolls from right to left and from bottom to top, character by character.
 
 Example :	`P_BANNER 9 5 9 1 27 .........Catch me!.........`  
 
@@ -341,9 +341,9 @@ Example :	`P_BANNER 9 5 9 1 27 .........Catch me!.........`
 **SET_FONT**  
 Purpose	: 	Set font character.  
 Arguments :  
-*<character-number>* (integer)  
-*<length>* (integer)  
-*<data>* (string)  
+*character-number* (integer)  
+*length* (integer)  
+*data* (string)  
 
 This command uploads a font character to internal storage. The example uploads a capital character 'A'. The data is binary and should be grouped per byte, MSB first. Whitespace is only for readability and doesn't have functional impact. Character 0 can be uploaded but remains unused because NUL-bytes ('\0') have a special meaning in the software (they indicate empty screen positions). This binary format can cause buffer overflows easily when uploading multiple font characters at once. Possible solutions (use multiple at once):  
 - Set debugging off ("SET_DEBUG 0")  
@@ -365,7 +365,7 @@ Example :
 
 **GET_FONT**  
 Purpose	: 	Get font character.  
-Arguments :	*<character-number>* (integer)  
+Arguments :	*character-number* (integer)  
 
 This does the opposite of SET_FONT and downloads a font character from internal storage.
 
@@ -375,7 +375,7 @@ Example :	`GET_FONT 65`
 
 **GET_SENSOR**  
 Purpose	: 	Get voltage sensor value.  
-Arguments :	*<sensor-id>* (integer)  
+Arguments :	*sensor-id* (integer)  
 
 The Micro MinimOSD board has 4 voltage sensors that are labelled "VBAT1", "VBAT2", "RSSI" and "CURR". Each of these sensors return a voltage that first should be calibrated, see "Calibrating sensors". While doing that and once done that, use GET_SENSOR to get the measured voltage. Sensor 0 and 1 can handle higher voltages but are less sensitive. For sensors 2 and 3 the opposite is true.
 The Micro board with KV-mod uses a 1k/14k6 resistor divider at pins VBAT1/VBAT2 so that a full scale measurement will be a bit more than 17V based on a 1.1V reference voltage. So this suits up to 4s lipos perfectly. The ATmega328 chip can use several reference voltages. But the KV-mod is designed with 1.1V reference voltage in mind. So we hard-coded that in the software. The RSSI/CURR pins have no resistor divider, only a resistor in series, so their max. voltage will be 1.1V. Unfortunately we can only choose one analogue reference voltage. If you need to measure higher voltages than 1.1V, put your own resistor divider in front.
@@ -414,7 +414,7 @@ Below getters and setters are generated commands. All getters have no arguments 
 Purpose	: 	Get/set version string.  
 Type : 		16 bytes string  
 Range :		15 characters  
-Default :	<version specific string>  
+Default :	*version specific string*  
 
 This holds the software version. At startup this value is compared to what is stored in the eeprom. If there's a mismatch, all configuration values are loaded with their defaults. This is to avoid possible corruption when the previously saved eeprom layout doesn't match any more due to software changes.
 
@@ -565,7 +565,7 @@ Type : 		8 bit value (boolean flags)
 Range :		0 - 3  
 Default :	3  
 
-By default the OSD prints ascii control characters and control strings that can be used to control the flow of operation. The first lower bit turns on ascii control characters for machine-to-machine operation. For example, ascii character 0x06 (ACK) on success and ascii character 0x15 (NAK) on failure. The second lower bit turns on human readable control strings like "<OK>" on success and "<FAIL>" on failure. See the general description for more info.
+By default the OSD prints ascii control characters and control strings that can be used to control the flow of operation. The first lower bit turns on ascii control characters for machine-to-machine operation. For example, ascii character 0x06 (ACK) on success and ascii character 0x15 (NAK) on failure. The second lower bit turns on human readable control strings like "\<OK\>" on success and "\<FAIL\>" on failure. See the general description for more info.
 
 Examples :  
 `GET_CONTROL`  

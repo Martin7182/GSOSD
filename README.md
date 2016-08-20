@@ -63,13 +63,13 @@ where SENSADJ is a configurable integer number between 0 and UINT16_MAX (65535).
 Example to calibrate VBAT1:
 - Attach 5.0V to the pin labelled "VBAT1".
 - Open a serial connection to the OSD.
-- Type in command "SET_SENSADJ0 20000" <press enter>.
-- Type in command "GET_SENSOR 0" <press enter>.
+- Type in command "SET_SENSADJ0 20000" \<press enter\>.
+- Type in command "GET_SENSOR 0" \<press enter\>.
   => The serial connection returns a value, say "6.20".
   => Final calibration value: 20000 * 5.0 / 6.20 = 16129.
-- Type in command "SET_SENSADJ0 16129" <press enter>.
+- Type in command "SET_SENSADJ0 16129" \<press enter\>.
 - Use command "GET_SENSOR 0" to check whether it returns "5.00" now.
-- Save settings with command "SAVE" <press enter>.
+- Save settings with command "SAVE" \<press enter\>.
 
 
 Example application; battery voltage & remaining run time
