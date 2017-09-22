@@ -8,7 +8,7 @@ Hardware
 Operating the OSD is done using a single push button that can be attached between any of the sensor inputs (VBAT1, VBAT2, RSSI or CURR) and ground, provided that you use a pullup resistor to set the input high by default. You can still use all of these inputs to measure voltages though. But when doing so, you should not short the voltage source if that creates a problem (smoke!). So use a resistor in series with your voltage source if needed. A 1k resistor will do in all cases, see below schematics. This won't affect the sensor's accuracy in any way.
 A voltage below ~5% of full-scale will be seen as "low", above that it will be seen as "high". With the internal 1k5/22k voltage dividers this will be at ~0.9V externally. The OSD checks all sensor voltages at startup to determine which inputs are above that threshold. Any of these sensors can be used to control the OSD.
 
-[standalone.gif](images/standalone.gif)
+![standalone.jpg](images/standalone.jpg)
 
 
 Demo
