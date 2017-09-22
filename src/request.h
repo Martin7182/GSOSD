@@ -27,8 +27,13 @@
 #ifndef REQUEST_H
 #define REQUEST_H
 
-int freemem(void);
-
+/*
+ * serial_request() and sensor_request() are made public to avoid compiler
+ * warning: ‘void xxx_request()’ defined but not used.
+ * See request() for more info.
+ */
+void serial_request(void);
+void sensor_request(void);
 void request(void);
 
 #endif /* REQUEST_H */

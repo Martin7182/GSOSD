@@ -1,5 +1,5 @@
 /*========================================================================
- *  Copyright (c) 2016 Martin7182
+ *  Copyright (c) 2017 Martin7182
  *
  *  This file is part of GSOSD.
  *
@@ -16,34 +16,31 @@
  *  You should have received a copy of the GNU General Public License
  *  along with GSOSD.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  File	: sensor.h
- *  Purpose	: Declarations for sensors on the Micro MinimOSD board.
+ *  File	: misc.cpp
+ *  Purpose	: Miscellaneous routines.
  *  Author(s)	: Martin7182
- *  Creation	: 2016/06/16
+ *  Creation	: 2017/03/30
  *
  *========================================================================
  */
 
-#ifndef SENSOR_H
-#define SENSOR_H
 
-typedef enum sensor_t {		/* voltage sensor ids */
-    SENSOR0 = 0,		/* BAT1 sensor */
-    SENSOR1,			/* BAT2 sensor */
-    SENSOR2,			/* RSSI sensor */
-    SENSOR3,			/* CURR sensor */
-    SENSOR_NONE,		/* dummy value, must be last element! */
-} sensor_t;
+/*------------------------------------------------------------------------
+ *  Function	: freemem
+ *  Purpose	: Return available heap memory in bytes.
+ *  Method	: Use externals.
+ *
+ *  Returns	: Number in bytes.
+ *------------------------------------------------------------------------
+ */
+int
+freemem(void)
+{
+    extern int 	__heap_start;
+    extern int 	*__brkval;
+    int 	v;
 
-#define SENSOR_COUNT SENSOR_NONE
+    return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
+} /* freemem() */
 
-void sensor_setup(bool);
-
-float sensor_get_value(sensor_t);
-
-bool sensor_set_value(sensor_t, float);
-
-int16_t sensor_get_raw(sensor_t);
-
-#endif /* SENSOR_H */
 

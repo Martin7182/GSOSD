@@ -81,11 +81,20 @@ We'd like to show an example application that displays the ground station's batt
 TODO
 ----
 - Get rid of Arduino.
-- Put more static data into PROGMEM.
 - Automatically clear OSD texts, configurable.
 
 
 Other info
 ----------
-Max manual: https://datasheets.maximintegrated.com/en/ds/MAX7456.pdf  
-Avr manual: http://www.cs.ou.edu/~fagg/classes/general/atmel/avr-libc-user-manual-1.7.1.pdf
+- Max manual: https://datasheets.maximintegrated.com/en/ds/MAX7456.pdf  
+- Avr manual: http://www.cs.ou.edu/~fagg/classes/general/atmel/avr-libc-user-manual-1.7.1.pdf
+- GSOSD API: [API.md](API.md)
+- GSOSD stand alone: [STANDALONE.md](STANDALONE.md)
+
+
+Version information
+-------------------
+- 1.0.0	Initial version.
+- 1.1.0	Stand alone version.
+	- Control standalone/serial operation using compiler option.
+        - Control serial debugging output using compiler option.

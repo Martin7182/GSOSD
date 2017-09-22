@@ -84,7 +84,7 @@ sensor_setup(
  *  Method	: Use inbuilt resistor voltage divider and ATmega328 ADC set
  *  		  to 1.1V reference voltage.
  *
- *  Returns	: The measured voltage in volts.
+ *  Returns	: The measured voltage in volts, negative on error.
  *------------------------------------------------------------------------
  */
 float
@@ -120,3 +120,81 @@ sensor_get_value(
     }
     return factor * (float)sensadj * analogRead(pin) / (float)1023;
 }  /* sensor_get_value() */
+
+
+/*------------------------------------------------------------------------
+ *  Function	: sensor_set_value
+ *  Purpose	: Set voltage of requested sensor.
+ *  Method	: Calibrate sensor so that it displays target voltage.
+ *
+ *  Returns	: Indication of success.
+ *------------------------------------------------------------------------
+ */
+bool
+sensor_set_value(
+    sensor_t 	sensor,			/* sensor id */
+    float	voltage)		/* voltage to set */
+{
+    uint8_t 	pin;			/* hardware sensor pin */
+    bool 	(*sensadj)(uint16_t);	/* calibration function */
+    float	factor;			/* multiplication factor */
+
+    switch (sensor) {
+	case SENSOR0:
+	    pin = ATMEL_SENS0PIN;
+	    sensadj = cfg_set_sensadj0;
+	    factor = 0.001;
+	    break;
+	case SENSOR1:
+	    pin = ATMEL_SENS1PIN;
+	    sensadj = cfg_set_sensadj1;
+	    factor = 0.001;
+	    break;
+	case SENSOR2:
+	    pin = ATMEL_SENS2PIN;
+	    sensadj = cfg_set_sensadj2;
+	    factor = 0.0001;
+	    break;
+	case SENSOR3:
+	    pin = ATMEL_SENS3PIN;
+	    sensadj = cfg_set_sensadj3;
+	    factor = 0.0001;
+	    break;
+	default: return false;
+    }
+    return sensadj(voltage * (float)1023 / (factor * analogRead(pin)));
+} /* sensor_set_value() */
+
+
+/*------------------------------------------------------------------------
+ *  Function	: sensor_get_raw
+ *  Purpose	: Get raw sensor readout.
+ *  Method	: Use inbuilt resistor voltage divider and ATmega328 ADC set
+ *  		  to 1.1V reference voltage.
+ *
+ *  Returns	: The measures voltage in units.
+ *------------------------------------------------------------------------
+ */
+int16_t
+sensor_get_raw(
+    sensor_t 	sensor)	/* sensor id */
+{
+    uint8_t 	pin;	/* hardware sensor pin */
+
+    switch (sensor) {
+	case SENSOR0:
+	    pin = ATMEL_SENS0PIN;
+	    break;
+	case SENSOR1:
+	    pin = ATMEL_SENS1PIN;
+	    break;
+	case SENSOR2:
+	    pin = ATMEL_SENS2PIN;
+	    break;
+	case SENSOR3:
+	    pin = ATMEL_SENS3PIN;
+	    break;
+	default: return -1;
+    }
+    return analogRead(pin);
+} /* sensor_get_raw() */

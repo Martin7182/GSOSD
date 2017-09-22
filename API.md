@@ -49,6 +49,7 @@ An overview of basic commands is shown below. 'argc' is the number of arguments 
 | GET_SENSOR	| 1 	| N	| get sensor voltage
 | GET_WIDTH	| 0 	| N	| get screen width
 | GET_HEIGHT	| 0 	| N	| get screen height
+| GET_TIME	| 0 	| N	| get runtime since last start
 
 
 Config commands
@@ -405,6 +406,14 @@ Arguments :	none
 The screen height is currently different for PAL vs. NTSC.
 
 Example :	`GET_HEIGHT`	// likely returns "16" (PAL) or "13" (NTSC)  
+
+----
+
+**GET_TIME**  
+Purpose	: 	Get runtime in milliseconds since last start.
+Arguments :	none  
+
+Example :	`GET_TIME`  
 
 ----
 
