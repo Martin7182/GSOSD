@@ -55,7 +55,7 @@ const uint16_t CFG_SIZES[] PROGMEM = {
 };
 #undef X
 
-str16_t 	VERSION = "GSOSD 1.0.0";	/* current version */
+str16_t 	VERSION = "GSOSD 1.1.0";	/* current version */
 configdata_t 	configdata;			/* configurable parameters */
 
 /* X-macro generating local prototypes. */
@@ -117,6 +117,24 @@ store_str16_t(
    strncpy((char *)param, *(const char **)val, 15);
    ((char *)param)[15] = '\0';
 } /* store_str16_t() */
+
+
+/*------------------------------------------------------------------------
+ *  Function	: store_str5_t
+ *  Purpose	: Setter for str5_t-typed values.
+ *  Method	: Typecast & dereference void pointers.
+ *
+ *  Returns	: Nothing.
+ *------------------------------------------------------------------------
+ */
+static void
+store_str5_t(
+    void 	*param,	/* parameter to store */
+    const void 	*val)	/* value to store */
+{
+   strncpy((char *)param, *(const char **)val, 4);
+   ((char *)param)[4] = '\0';
+} /* store_str5t() */
 
 
 /*------------------------------------------------------------------------

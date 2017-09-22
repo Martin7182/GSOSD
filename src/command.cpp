@@ -300,9 +300,11 @@ cmd_about(
 {
     bool stx = false; 	/* whether STX printed */
 
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
         Serial.print("<about>");
     }
+#endif
     if (!cfg_get_silent() && cfg_get_control() & 0x01) {
         Serial.write((byte)CONTROL_STX);
 	stx = true;
@@ -338,9 +340,11 @@ cmd_list(
     char 	buf[CMD_SIZE];	/* buffer for PROGMEM strings */
     bool 	stx = false; 	/* whether STX printed */
 
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
         Serial.print("<list>");
     }
+#endif
 
     if (!cfg_get_silent() && cfg_get_control() & 0x01) {
         Serial.write((byte)CONTROL_STX);
@@ -390,9 +394,11 @@ cmd_reset(
     int32_t 	*args,	/* integer arguments */
 		...)	/* data arguments */
 {
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
         Serial.print("<reset>");
     }
+#endif
 
     return max_reset(false);
 } /* cmd_reset() */
@@ -420,6 +426,7 @@ cmd_clearpart(
     y = args[1];
     w = args[2];
     h = args[3];
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
 	Serial.print("<clearpart");
 	Serial.print(" x=");
@@ -432,6 +439,7 @@ cmd_clearpart(
 	Serial.print(h);
 	Serial.print(">");
     }
+#endif
 
     if (x < 0) x = 0;
     if (y < 0) y = 0;
@@ -466,9 +474,11 @@ cmd_clear(
 {
     uint16_t	pos;	/* screen buffer position */
 
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
 	Serial.print("<clear>");
     }
+#endif
 
     pos = screenbuf.cols * screenbuf.rows;
     do {
@@ -492,9 +502,11 @@ cmd_dump(
     int32_t 	*args,	/* integer arguments */
 		...)	/* data arguments */
 {
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
         Serial.print("<dump>");
     }
+#endif
 
     return cfg_dump();
 } /* cmd_dump() */
@@ -513,9 +525,11 @@ cmd_load(
     int32_t 	*args,	/* integer arguments */
 		...)	/* data arguments */
 {
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
         Serial.print("<load>");
     }
+#endif
 
     return cfg_load(false);
 } /* cmd_load() */
@@ -534,9 +548,11 @@ cmd_defaults(
     int32_t 	*args,	/* integer arguments */
 		...)	/* data arguments */
 {
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
         Serial.print("<defaults>");
     }
+#endif
 
     cfg_load_defaults();
     return true;
@@ -556,9 +572,11 @@ cmd_save(
     int32_t 	*args,	/* integer arguments */
 		...)	/* data arguments */
 {
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
         Serial.print("<save>");
     }
+#endif
 
     return cfg_save(false);
 } /* cmd_save() */
@@ -583,12 +601,14 @@ cmd_hos(
 
     num = args[0];
 
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
 	Serial.print("<hos");
 	Serial.print(" num=");
 	Serial.print(num);
 	Serial.print(">");
     }
+#endif
 
     if ((result = (val = max_hos(num)) >= 0)) cmd_output_uint8(val);
     return result;
@@ -614,12 +634,14 @@ cmd_vos(
 
     num = args[0];
 
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
 	Serial.print("<vos");
 	Serial.print(" num=");
 	Serial.print(num);
 	Serial.print(">");
     }
+#endif
 
     if ((result = (val = max_vos(num)) >= 0)) cmd_output_uint8(val);
     return result;
@@ -646,12 +668,14 @@ cmd_insmux1(
 
     num = args[0];
 
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
 	Serial.print("<insmux1");
 	Serial.print(" num=");
 	Serial.print(num);
 	Serial.print(">");
     }
+#endif
 
     if ((result = (val = max_insmux1(num)) >= 0)) cmd_output_uint8(val);
     return result;
@@ -678,12 +702,14 @@ cmd_insmux2(
 
     num = args[0];
 
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
 	Serial.print("<insmux2");
 	Serial.print(" num=");
 	Serial.print(num);
 	Serial.print(">");
     }
+#endif
 
     if ((result = (val = max_insmux2(num)) >= 0)) cmd_output_uint8(val);
     return result;
@@ -711,6 +737,7 @@ cmd_cbl(
     line = (int8_t)args[0];
     num = args[1];
 
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
 	Serial.print("<cbl");
 	Serial.print(" line=");
@@ -719,6 +746,7 @@ cmd_cbl(
 	Serial.print(num);
 	Serial.print(">");
     }
+#endif
 
     if ((result = (val = max_cbl(line, num)) >= 0)) cmd_output_uint8(val);
     return result;
@@ -746,6 +774,7 @@ cmd_cwl(
     line = (int8_t)args[0];
     num = args[1];
 
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
 	Serial.print("<cwl");
 	Serial.print(" line=");
@@ -754,6 +783,7 @@ cmd_cwl(
 	Serial.print(num);
 	Serial.print(">");
     }
+#endif
 
     if ((result = (val = max_cwl(line, num)) >= 0)) cmd_output_uint8(val);
     return result;
@@ -778,7 +808,6 @@ cmd_p_raw(
     int		i;	/* num of bytes processed in earlier calls */
     int		len;	/* data length in bytes */
     const char	*data;	/* data to process */
-    char	ch;	/* data character */
     va_list	ap;	/* va_list handle */
     bool 	result;	/* return value */
 
@@ -790,6 +819,7 @@ cmd_p_raw(
     data = va_arg(ap, const char *);
     va_end(ap);
 
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
 	Serial.print("<p_raw");
 	Serial.print(" x=");
@@ -802,6 +832,7 @@ cmd_p_raw(
 	Serial.print(len);
 	Serial.print(" data=");
 	for (int j = 0; j < len; j++) {
+            char ch;	/* data character */
 	    if (isprint(ch = data[j])) {
 		Serial.write(ch);
 	    } else {
@@ -811,6 +842,7 @@ cmd_p_raw(
 	}
 	Serial.print(">");
     }
+#endif
 
     result = print_raw(x, y, i, len, data);
     return result;
@@ -837,7 +869,6 @@ cmd_p_window(
     int		i;	/* num of bytes processed in earlier calls */
     int		len;	/* data length in bytes */
     const char	*data;	/* data to process */
-    char	ch;	/* data character */
     va_list	ap;	/* va_list handle */
     int8_t 	xw;	/* X-coordinate of window position */
     int8_t 	yw;	/* Y-coordinate of window position */
@@ -853,6 +884,7 @@ cmd_p_window(
     data = va_arg(ap, const char *);
     va_end(ap);
 
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
 	Serial.print("<p_window");
 	Serial.print(" x=");
@@ -869,6 +901,7 @@ cmd_p_window(
 	Serial.print(len);
 	Serial.print(" data=");
 	for (j = 0; j < len; j++) {
+            char ch;	/* data character */
 	    if (isprint(ch = data[j])) {
 		Serial.write(ch);
 	    } else {
@@ -878,6 +911,7 @@ cmd_p_window(
 	}
 	Serial.print(">");
     }
+#endif
 
     if (y < 0 || x < 0 || w == 0 || h == 0
         || y + abs(h) > screenbuf.rows || x + abs(w) > screenbuf.cols) {
@@ -965,7 +999,6 @@ cmd_p_banner(
     int		i;	/* num of bytes processed in earlier calls */
     int		len;	/* data length in bytes */
     const char	*data;	/* data to process */
-    char	ch;	/* data character */
     va_list	ap;	/* va_list handle */
     int8_t 	xw;	/* X-coordinate of window position */
     int8_t 	yw;	/* Y-coordinate of window position */
@@ -980,6 +1013,7 @@ cmd_p_banner(
     data = va_arg(ap, const char *);
     va_end(ap);
 
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
 	Serial.print("<p_banner");
 	Serial.print(" x=");
@@ -996,6 +1030,7 @@ cmd_p_banner(
 	Serial.print(len);
 	Serial.print(" data=");
 	for (int j = 0; j < len; j++) {
+            char ch;	/* data character */
 	    if (isprint(ch = data[j])) {
 		Serial.write(ch);
 	    } else {
@@ -1005,6 +1040,7 @@ cmd_p_banner(
 	}
 	Serial.print(">");
     }
+#endif
 
     if (y < 0 || x < 0 || w == 0 || h == 0
         || y + abs(h) > screenbuf.rows || x + abs(w) > screenbuf.cols) {
@@ -1114,6 +1150,7 @@ cmd_set_font(
     len = va_arg(ap, int);
     data = va_arg(ap, const char *);
     va_end(ap);
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
 	Serial.print("<set_font");
 	Serial.print(" num=");
@@ -1133,6 +1170,7 @@ cmd_set_font(
 	}
 	Serial.print(">");
     }
+#endif
 
     if (num < 0 || num > 255) {
 	return false;
@@ -1191,12 +1229,14 @@ cmd_get_font(
 
     num = args[0];
 
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
 	Serial.print("<get_font");
 	Serial.print(" num=");
 	Serial.print(num);
 	Serial.print(">");
     }
+#endif
 
     if (num < 0 || num > 255) {
 	return false;
@@ -1253,12 +1293,14 @@ cmd_get_sensor(
 
     id = args[0];
 
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
 	Serial.print("<get_sensor");
 	Serial.print(" id=");
 	Serial.print(id);
 	Serial.print(">");
     }
+#endif
 
     if ((val = sensor_get_value((sensor_t)id)) < EPS) {
 	return false;
@@ -1290,9 +1332,11 @@ cmd_get_width(
 {
     bool stx = false; 	/* whether STX printed */
 
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
 	Serial.print("<get_width>");
     }
+#endif
     if (!cfg_get_silent() && cfg_get_control() & 0x01) {
         Serial.write((byte)CONTROL_STX);
 	stx = true;
@@ -1320,9 +1364,11 @@ cmd_get_height(
 {
     bool stx = false; 	/* whether STX printed */
 
+#ifndef NO_DEBUG
     if (!cfg_get_silent() && cfg_get_debug()) {
 	Serial.print("<get_height>");
     }
+#endif
     if (!cfg_get_silent() && cfg_get_control() & 0x01) {
         Serial.write((byte)CONTROL_STX);
 	stx = true;
@@ -1333,3 +1379,35 @@ cmd_get_height(
     }
     return true;
 } /* cmd_get_height() */
+
+
+/*------------------------------------------------------------------------
+ *  Function	: cmd_get_time
+ *  Purpose	: Get runtime in milliseconds since last start.
+ *  Method	: Write to serial.
+ *
+ *  Returns	: Indication of success.
+ *------------------------------------------------------------------------
+ */
+bool
+cmd_get_time(
+    int32_t 	*args,	/* integer arguments */
+		...)	/* data arguments */
+{
+    bool stx = false; 	/* whether STX printed */
+
+#ifndef NO_DEBUG
+    if (!cfg_get_silent() && cfg_get_debug()) {
+	Serial.print("<get_time>");
+    }
+#endif
+    if (!cfg_get_silent() && cfg_get_control() & 0x01) {
+        Serial.write((byte)CONTROL_STX);
+	stx = true;
+    }
+    Serial.print(millis());
+    if (stx) {
+        Serial.write((byte)CONTROL_ETX);
+    }
+    return true;
+} /* cmd_get_time() */

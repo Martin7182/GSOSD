@@ -33,6 +33,7 @@
 #include "sensor.h"
 #include "command.h"
 #include "globals.h"
+#include "misc.h"
 
 // Workaround for http://gcc.gnu.org/bugzilla/show_bug.cgi?id=34734
 #ifdef PROGMEM
@@ -110,10 +111,12 @@ setup(void)
         if (cfg_get_control() & 0x02) {
 	    Serial.print(F("Welcome to GS-OSD, version: "));
 	    Serial.println(cfg_get_version());
+#ifndef NO_DEBUG
 	    if (cfg_get_debug()) {
 		Serial.print(freemem());
 		Serial.print(" ");
 	    }
+#endif
 	    Serial.print(F("GSOSD>"));
 	}
         if (cfg_get_control() & 0x01) {

@@ -37,6 +37,7 @@
  * loaded. See cfg_load() for details.
  */
 typedef char str16_t[16];
+typedef char str5_t[5];
 typedef const char *str_t;
 extern str16_t VERSION;
 
@@ -65,7 +66,30 @@ X(CFG_SENSADJ1,	"SENSADJ1",sensadj1, uint16_t,	uint16_t,       20000)	     \
 X(CFG_SENSADJ2,	"SENSADJ2",sensadj2, uint16_t,	uint16_t,       20000)	     \
 X(CFG_SENSADJ3,	"SENSADJ3",sensadj3, uint16_t,	uint16_t,       20000)	     \
 
-#define CONFIG_TABLE CONFIG_TABLE0 CONFIG_TABLE1
+/* Following values are for standalone build only. */
+#define CONFIG_TABLE2							     \
+X(CFG_SENSV0, 	"SENSV0",  sensv0,   bool,	bool,	  	true)	     \
+X(CFG_SENSX0,	"SENSX0",  sensx0,   uint8_t,	uint8_t,  	1)	     \
+X(CFG_SENSY0,	"SENSY0",  sensy0,   uint8_t,	uint8_t,  	1)	     \
+X(CFG_SENST0,	"SENST0",  senst0,   str_t,	str5_t,  	"V")	     \
+X(CFG_SENSV1, 	"SENSV1",  sensv1,   bool,	bool,	  	true)	     \
+X(CFG_SENSX1,	"SENSX1",  sensx1,   uint8_t,	uint8_t,  	1)	     \
+X(CFG_SENSY1,	"SENSY1",  sensy1,   uint8_t,	uint8_t,  	2)	     \
+X(CFG_SENST1,	"SENST1",  senst1,   str_t,	str5_t,  	"V")	     \
+X(CFG_SENSV2, 	"SENSV2",  sensv2,   bool,	bool,	  	true)	     \
+X(CFG_SENSX2,	"SENSX2",  sensx2,   uint8_t,	uint8_t,  	1)	     \
+X(CFG_SENSY2,	"SENSY2",  sensy2,   uint8_t,	uint8_t,  	3)	     \
+X(CFG_SENST2,	"SENST2",  senst2,   str_t,	str5_t,  	"V")	     \
+X(CFG_SENSV3, 	"SENSV3",  sensv3,   bool,	bool,	  	true)	     \
+X(CFG_SENSX3,	"SENSX3",  sensx3,   uint8_t,	uint8_t,  	1)	     \
+X(CFG_SENSY3,	"SENSY3",  sensy3,   uint8_t,	uint8_t,  	4)	     \
+X(CFG_SENST3,	"SENST3",  senst3,   str_t,	str5_t,		"V")	     \
+X(CFG_TIMEV, 	"TIMEV",   timev,    bool,	bool,	  	true)	     \
+X(CFG_TIMEX,	"TIMEX",   timex,    uint8_t,	uint8_t,  	1)	     \
+X(CFG_TIMEY,	"TIMEY",   timey,    uint8_t,	uint8_t,  	5)	     \
+X(CFG_TIMET,	"TIMET",   timet,    str_t,	str5_t,  	"")	     \
+
+#define CONFIG_TABLE CONFIG_TABLE0 CONFIG_TABLE1 CONFIG_TABLE2
 
 /* X-macro generating config enums. */
 #define X(key, name, var, type, stype, def) key,

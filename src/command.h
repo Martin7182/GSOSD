@@ -36,7 +36,7 @@
 
 #define CMD_SIZE (16)	/* Maximum size for name in bytes */
 
-/* A list of all commands */
+/* A list of all commands, except configuration getters/setters.        */
 /* key			name		function	nargs	data	*/
 #define COMMAND_TABLE 							\
 X(CMD_ABOUT, 		"ABOUT",	cmd_about, 	0, 	false)	\
@@ -62,6 +62,7 @@ X(CMD_GET_FONT, 	"GET_FONT",	cmd_get_font,	1, 	false)	\
 X(CMD_GET_SENSOR, 	"GET_SENSOR",	cmd_get_sensor,	1, 	false)	\
 X(CMD_GET_WIDTH, 	"GET_WIDTH",	cmd_get_width,	0, 	false)	\
 X(CMD_GET_HEIGHT, 	"GET_HEIGHT",	cmd_get_height,	0, 	false)	\
+X(CMD_GET_TIME, 	"GET_TIME",	cmd_get_time,	0, 	false)	\
 
 /* X-macros generating function prototypes. */
 #define X(key, name, func, nargs, data)	\

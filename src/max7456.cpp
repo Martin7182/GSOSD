@@ -567,9 +567,11 @@ max_enable(
 
     digitalWrite(MAX_SELECTPIN, LOW);
     if (reg_getbit(R_VM0, VM0_ENABLE) != enable) {
+#ifndef NO_DEBUG
 	if (!cfg_get_silent() && cfg_get_debug()) {
 	    Serial.println(F("<Restore VM0 register>"));
 	}
+#endif
 	if (!reg_setbit_check(W_VM0, VM0_ENABLE, enable)) {
 	    result = false;
 	}
@@ -727,25 +729,31 @@ max_videodetect(void)
 	if ((pal_detected = !pal_detected)) {
 	    reg_setbit(W_VM0, VM0_VIDEOSELECT_PAL, true);
 	    screenbuf.rows = PALROWS;
+#ifndef NO_DEBUG
             if (!cfg_get_silent() && cfg_get_debug()) {
                 Serial.println(F("<PAL detected>"));
 	    }
+#endif
 	}
     }
     if (ntsc_detected != reg_getbit(R_STAT, STAT_NTSC)) {
 	if ((ntsc_detected = !ntsc_detected)) {
 	    reg_setbit(W_VM0, VM0_VIDEOSELECT_PAL, false);
 	    screenbuf.rows = NTSCROWS;
+#ifndef NO_DEBUG
             if (!cfg_get_silent() && cfg_get_debug()) {
 	        Serial.println(F("<NTSC detected>"));
 	    }
+#endif
 	}
     }
     if (los_detected != reg_getbit(R_STAT, STAT_LOS)) {
 	if ((los_detected = !los_detected)) {
+#ifndef NO_DEBUG
             if (!cfg_get_silent() && cfg_get_debug()) {
 	        Serial.println(F("<Loss-of-sync detected>"));
 	    }
+#endif
 	}
     }
     digitalWrite(MAX_SELECTPIN, HIGH);
