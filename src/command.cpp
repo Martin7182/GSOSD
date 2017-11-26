@@ -16,7 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with GSOSD.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  File	: command.c
+ *  File	: command.cpp
  *  Purpose	: API commands handling.
  *  Author(s)	: Martin7182
  *  Creation	: 2016/05/26
@@ -32,6 +32,7 @@
 #include "max7456.h"
 #include "sensor.h"
 #include "config.h"
+#include "font.h"
 #include "globals.h"
 #include "command.h"
 
@@ -119,7 +120,7 @@ bool cmd_cfg_get_ ## func(int32_t *args, ...)	\
     bool stx = false; /* whether STX printed */ \
     						\
     if (!cfg_get_silent()			\
-        && cfg_get_control() & 0x01) {		\
+        && (cfg_get_control() & 0x01) != 0x00) {\
         Serial.write((byte)CONTROL_STX);	\
 	stx = true;				\
     }						\
@@ -274,7 +275,7 @@ cmd_output_uint8(
 {
     bool stx = false; 	/* whether STX printed */
 
-    if (!cfg_get_silent() && cfg_get_control() & 0x01) {
+    if (!cfg_get_silent() && (cfg_get_control() & 0x01) != 0x00) {
         Serial.write((byte)CONTROL_STX);
 	stx = true;
     }
@@ -305,7 +306,7 @@ cmd_about(
         Serial.print("<about>");
     }
 #endif
-    if (!cfg_get_silent() && cfg_get_control() & 0x01) {
+    if (!cfg_get_silent() && (cfg_get_control() & 0x01) != 0x00) {
         Serial.write((byte)CONTROL_STX);
 	stx = true;
     }
@@ -346,7 +347,7 @@ cmd_list(
     }
 #endif
 
-    if (!cfg_get_silent() && cfg_get_control() & 0x01) {
+    if (!cfg_get_silent() && (cfg_get_control() & 0x01) != 0x00) {
         Serial.write((byte)CONTROL_STX);
 	stx = true;
     }
@@ -1119,6 +1120,59 @@ cmd_p_banner(
 
 
 /*------------------------------------------------------------------------
+ *  Function	: cmd_font_effect
+ *  Purpose	: Apply effect to current font in Max7456 chip (eeprom).
+ *  Method	: Call font_apply().
+ *
+ *  Returns	: Indication of success.
+ *------------------------------------------------------------------------
+ */
+bool
+cmd_font_effect(
+	int32_t *args,	/* integer arguments */
+	...)		/* data arguments */
+{
+    fonteffect_t	effect;	/* font effect to apply */
+
+    effect = (fonteffect_t)args[0];
+
+#ifndef no_debug
+    if (!cfg_get_silent() && cfg_get_debug()) {
+	Serial.print("<font_effect");
+	Serial.print(" effect=");
+	Serial.print(effect);
+	Serial.print(">");
+    }
+#endif
+
+    return font_apply(&effect);
+} /* cmd_font_effect() */
+
+
+/*------------------------------------------------------------------------
+ *  Function	: cmd_font_reset
+ *  Purpose	: Load default font into Max7456 chip (eeprom).
+ *  Method	: Call font_apply().
+ *
+ *  Returns	: Indication of success.
+ *------------------------------------------------------------------------
+ */
+bool
+cmd_font_reset(
+	int32_t *args,	/* integer arguments */
+	...)		/* data arguments */
+{
+#ifndef NO_DEBUG
+    if (!cfg_get_silent() && cfg_get_debug()) {
+        Serial.print("<font_reset>");
+    }
+#endif
+
+    return font_apply(NULL);
+} /* cmd_font_reset() */
+
+
+/*------------------------------------------------------------------------
  *  Function	: cmd_set_font
  *  Purpose	: Put font character to Max7456 chip (eeprom).
  *  Method	: Fill local buffer, write font character when last byte
@@ -1223,9 +1277,9 @@ cmd_get_font(
     int32_t 	*args,	/* integer arguments */
 		...)	/* data arguments */
 {
-    int32_t		num;		/* number of char to get [0 .. 255] */
-    static fontbuf_t 	buf;		/* font character buffer */
-    bool 		stx = false; 	/* whether STX printed */
+    int32_t	num;		/* number of char to get [0 .. 255] */
+    fontbuf_t 	buf;		/* font character buffer */
+    bool 	stx = false; 	/* whether STX printed */
 
     num = args[0];
 
@@ -1245,7 +1299,7 @@ cmd_get_font(
     if(!max_fontcharget((uint8_t)num, &buf)) {
 	return false;
     }
-    if (!cfg_get_silent() && cfg_get_control() & 0x01) {
+    if (!cfg_get_silent() && (cfg_get_control() & 0x01) != 0x00) {
         Serial.write((byte)CONTROL_STX);
 	stx = true;
     }
@@ -1305,7 +1359,7 @@ cmd_get_sensor(
     if ((val = sensor_get_value((sensor_t)id)) < EPS) {
 	return false;
     }
-    if (!cfg_get_silent() && cfg_get_control() & 0x01) {
+    if (!cfg_get_silent() && (cfg_get_control() & 0x01) != 0x00) {
         Serial.write((byte)CONTROL_STX);
 	stx = true;
     }
@@ -1337,7 +1391,7 @@ cmd_get_width(
 	Serial.print("<get_width>");
     }
 #endif
-    if (!cfg_get_silent() && cfg_get_control() & 0x01) {
+    if (!cfg_get_silent() && (cfg_get_control() & 0x01) != 0x00) {
         Serial.write((byte)CONTROL_STX);
 	stx = true;
     }
@@ -1369,7 +1423,7 @@ cmd_get_height(
 	Serial.print("<get_height>");
     }
 #endif
-    if (!cfg_get_silent() && cfg_get_control() & 0x01) {
+    if (!cfg_get_silent() && (cfg_get_control() & 0x01) != 0x00) {
         Serial.write((byte)CONTROL_STX);
 	stx = true;
     }
@@ -1401,7 +1455,7 @@ cmd_get_time(
 	Serial.print("<get_time>");
     }
 #endif
-    if (!cfg_get_silent() && cfg_get_control() & 0x01) {
+    if (!cfg_get_silent() && (cfg_get_control() & 0x01) != 0x00) {
         Serial.write((byte)CONTROL_STX);
 	stx = true;
     }

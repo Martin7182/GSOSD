@@ -57,6 +57,8 @@ X(CMD_CWL,		"CWL",		cmd_cwl,	2, 	false)	\
 X(CMD_P_RAW, 		"P_RAW",	cmd_p_raw,	2, 	true) 	\
 X(CMD_P_WINDOW,		"P_WINDOW",	cmd_p_window,	4, 	true) 	\
 X(CMD_P_BANNER,		"P_BANNER",	cmd_p_banner,	4, 	true) 	\
+X(CMD_FONT_EFFECT, 	"FONT_EFFECT",	cmd_font_effect,1, 	false)	\
+X(CMD_FONT_RESET, 	"FONT_RESET",	cmd_font_reset, 0, 	false)	\
 X(CMD_SET_FONT, 	"SET_FONT",	cmd_set_font,	1, 	true)	\
 X(CMD_GET_FONT, 	"GET_FONT",	cmd_get_font,	1, 	false)	\
 X(CMD_GET_SENSOR, 	"GET_SENSOR",	cmd_get_sensor,	1, 	false)	\

@@ -42,7 +42,7 @@
  * X-macro generating write register addresses.
  * W_VM0 = 0x00, W_VM1 = 0x01, etc.
  */
-#define X(addr, key, name, def, restore) W_ ## key = addr & 0x7F,
+#define X(addr, key, name, def, restore, stat, dmm) W_ ## key = addr & 0x7F,
 typedef enum regw_t {
     REG_MAP_RW
 } regw_t;
@@ -53,7 +53,7 @@ typedef enum regw_t {
  * R_VM0 = 0x80, R_VM1 = 0x81, etc.
  */
 typedef enum regr_t {
-#define X(addr, key, name, def, restore) R_ ## key = addr,
+#define X(addr, key, name, def, restore, stat, dmm) R_ ## key = addr,
     REG_MAP_RW
 #undef X
 #define X(addr, key, name) R_ ## key = addr,
@@ -100,7 +100,7 @@ typedef enum regr_t {
 
 
 /* X-macro generating default register values as per Max7456 manual */
-#define X(addr, key, name, def, restore) def,
+#define X(addr, key, name, def, restore, stat, dmm) def,
 regset_t DEFREGVALS = {
     { REG_MAP_RW }
 };
@@ -112,7 +112,7 @@ typedef struct regsave_t {		/* register save eeprom info */
 } regsave_t, *regsave_p;
 
 /* X-macro generating a lookup list of registers to save in eeprom */
-#define X(addr, key, name, def, restore) { W_ ## key, restore },
+#define X(addr, key, name, def, restore, stat, dmm) { W_ ## key, restore },
 regsave_t REGSAVE[] = {
     REG_MAP_RW
 };
@@ -127,6 +127,48 @@ regsave_t REGSAVE[] = {
  * synchronisation (vsync).
  */
 screenbuf_t 	screenbuf = { {0}, {0}, NTSCROWS, MAXCOLS, false};
+
+
+/*------------------------------------------------------------------------
+ *  Function	: reg_check_STAT_CHARMEM_UNAVAIL
+ *  Purpose	: Check whether register write should wait for STAT register.
+ *  Method	: Use X-macro that returns true for all involved registers.
+ *
+ *  Returns	: True if write has to wait, false otherwise.
+ *------------------------------------------------------------------------
+ */
+static bool
+reg_check_STAT_CHARMEM_UNAVAIL(
+    regw_t 	reg)	/* register to write */
+{
+    return false
+#define X(addr, key, name, def, restore, stat, dmm) \
+	|| (reg == R2W(addr) && stat)
+REG_MAP_RW
+#undef X
+   ;
+} /* reg_check_STAT_CHARMEM_UNAVAIL() */
+
+
+/*------------------------------------------------------------------------
+ *  Function	: reg_check_DMM_CLEAR
+ *  Purpose	: Check whether register write should wait for DMM register.
+ *  Method	: Use X-macro that returns true for all involved registers.
+ *
+ *  Returns	: True if write has to wait, false otherwise.
+ *------------------------------------------------------------------------
+ */
+static bool
+reg_check_DMM_CLEAR(
+    regw_t 	reg)	/* register to write */
+{
+    return false
+#define X(addr, key, name, def, restore, stat, dmm) \
+        || (reg == R2W(addr) && dmm)
+REG_MAP_RW
+#undef X
+   ;
+} /* reg_check_DMM_CLEAR() */
 
 
 /*------------------------------------------------------------------------
@@ -150,20 +192,68 @@ reg_read(
 
 
 /*------------------------------------------------------------------------
- *  Function	: reg_write
- *  Purpose	: Write a register.
- *  Method	: Use SPI.
+ *  Function	: reg_getbit
+ *  Purpose	: Get register bit value.
+ *  Method	: Read register and select bit.
  *
- *  Returns	: Nothing.
+ *  Returns	: true if the bit is 1, false otherwise.
  *------------------------------------------------------------------------
  */
-static void
+static bool
+reg_getbit(
+    regr_t 	reg,	/* register to read */
+    uint8_t 	bitnr)	/* bit number to read [0 .. 7] */
+{
+    uint8_t val;	/* register value */
+
+    val = reg_read(reg);
+    return (val & (0x01 << bitnr)) != 0 ? true : false;
+} /* reg_getbit() */
+
+
+/*------------------------------------------------------------------------
+ *  Function	: reg_write
+ *  Purpose	: Write a register.
+ *  Method	: Possibly wait for conditions to be met, use SPI.
+ *
+ *  As per Max7456 manual, some register writes are subject to any of these
+ *  conditions:
+ *  1) STAT[5] = 0, the character memory is not busy.
+ *  2) DMM[2] = 0, the display memory is not in the process of being cleared.
+ *  Therefore we check these conditions and wait for them to be met.
+ *
+ *  Returns	: Indication of success.
+ *------------------------------------------------------------------------
+ */
+static bool
 reg_write(
     regw_t 	reg,	/* register to write */
     uint8_t 	value)	/* value to write */
 {
+#define MAXWAIT 100
+
+    int i;		/* number of milliseconds we had to wait */
+
+    if (reg_check_STAT_CHARMEM_UNAVAIL(reg)) {
+	for (i = 0;
+	     i < MAXWAIT && reg_getbit(R_STAT, STAT_CHARMEM_UNAVAIL);
+	     i++) {
+	    delay(1);
+	}
+	if (i >= MAXWAIT) return false;
+    }
+    if (reg_check_DMM_CLEAR(reg)) {
+	for (i = 0;
+	     i < MAXWAIT && reg_getbit(R_DMM, DMM_CLEAR);
+	     i++) {
+	    delay(1);
+	}
+	if (i >= MAXWAIT) return false;
+    }
     SPI.transfer(reg);
     SPI.transfer(value);
+    return true;
+#undef MAXWAIT
 } /* reg_write() */
 
 
@@ -180,7 +270,7 @@ reg_write_check(
     regw_t 	reg,	/* register to write */
     uint8_t 	value)	/* value to write */
 {
-    reg_write(reg, value);
+    if (!reg_write(reg, value)) return false;
     return reg_read(W2R(reg)) == value;
 } /* reg_write_check() */
 
@@ -193,7 +283,7 @@ reg_write_check(
  *  Returns	: New calculated value.
  *------------------------------------------------------------------------
  */
-static __inline__ uint8_t
+static uint8_t
 reg_newval(
     regw_t 	reg,	/* register to write */
     uint8_t 	bitnr,	/* bit number to write [0 .. 7] */
@@ -254,26 +344,6 @@ reg_setbit_check(
 
 
 /*------------------------------------------------------------------------
- *  Function	: reg_getbit
- *  Purpose	: Get register bit value.
- *  Method	: Read register and select bit.
- *
- *  Returns	: true if the bit is 1, false otherwise.
- *------------------------------------------------------------------------
- */
-static bool
-reg_getbit(
-    regr_t 	reg,	/* register to read */
-    uint8_t 	bitnr)	/* bit number to read [0 .. 7] */
-{
-    uint8_t val;	/* register value */
-
-    val = reg_read(reg);
-    return (val & (0x01 << bitnr)) != 0 ? true : false;
-} /* reg_getbit() */
-
-
-/*------------------------------------------------------------------------
  *  Function	: max_refreshscreen
  *  Purpose	: Write the shadow screenbuffer to screen.
  *  Method	: Use 16 bit-mode and no auto-increment.
@@ -288,16 +358,17 @@ max_refreshscreen()
     uint16_t	 highpos;	/* highest screen position + 1 */
     static bool	 busy;		/* whether we're still busy */
 
-    if (!screenbuf.dirty || busy) {
+    if (!screenbuf.dirty || busy || digitalRead(MAX_SELECTPIN) == LOW) {
 	/*
 	 * No screen changes.
 	 * Or we were interrupted by a new vsync.
+	 * Or we're interrupting another Max7456 routine.
 	 */
 	return true;
     }
+    digitalWrite(MAX_SELECTPIN, LOW);
     busy = true;
     screenbuf.dirty = false;
-    digitalWrite(MAX_SELECTPIN, LOW);
 
     /*
      * We choose not to use the auto-increment mode although there would be no
@@ -646,9 +717,6 @@ max_fontcharget(
     reg_setbit(W_VM0, VM0_ENABLE, false);
     reg_write(W_CMAH, num);
     reg_write(W_CMM, 0x5F);
-    do {
-        delay(1);	/* typical should be 0.0005ms, wait a little longer */
-    } while (reg_getbit(R_STAT, STAT_CHARMEM_UNAVAIL));
 
     /*
      * Note that because buf is a pointer to fontbuf_t data, sizeof(*buf) gives
@@ -656,8 +724,8 @@ max_fontcharget(
      * would return the size of a pointer. This is only true when passed as a
      * function parameter like here.
      */
-    for (unsigned i = 0; i < sizeof(*buf); i++) {
-	reg_write(W_CMAL, i);
+    for (uint16_t i = 0; i < sizeof(*buf); i++) {
+	reg_write(W_CMAL, (uint8_t)i);
 	(*buf)[i] = reg_read(R_CMDO);
     }
     reg_setbit(W_VM0, VM0_ENABLE, true);
@@ -694,9 +762,6 @@ max_fontcharput(
 	reg_write(W_CMDI, (*buf)[i]);
     }
     reg_write(W_CMM, 0xAF);
-    do {
-        delay(15);	/* typical should be 12ms, wait a little longer */
-    } while (reg_getbit(R_STAT, STAT_CHARMEM_UNAVAIL));
     reg_setbit(W_VM0, VM0_ENABLE, true);
     digitalWrite(MAX_SELECTPIN, HIGH);
     return true;

@@ -95,7 +95,7 @@ setup(void)
      * which gave me two seconds (default delay) to start uploading a new
      * sketch before the corruption occurred.
      */
-    delay(3000);
+    delay(2000);
     SPI.begin();
     cfg_load_defaults();
     max_setup(true);
@@ -103,26 +103,9 @@ setup(void)
     cfg_load(true);
     Serial.begin(cfg_get_baudrate());
     max_videodetect();
+    request_init1();
     show_logo();
-    if (!cfg_get_silent()) {
-        if (cfg_get_control() & 0x01) {
-    	    Serial.write((byte)CONTROL_SOH);
-	}
-        if (cfg_get_control() & 0x02) {
-	    Serial.print(F("Welcome to GS-OSD, version: "));
-	    Serial.println(cfg_get_version());
-#ifndef NO_DEBUG
-	    if (cfg_get_debug()) {
-		Serial.print(freemem());
-		Serial.print(" ");
-	    }
-#endif
-	    Serial.print(F("GSOSD>"));
-	}
-        if (cfg_get_control() & 0x01) {
-    	    Serial.write((byte)CONTROL_EOT);
-	}
-    }
+    request_init2();
 } /* setup() */
 
 

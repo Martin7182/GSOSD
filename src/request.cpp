@@ -38,6 +38,7 @@
 #include "misc.h"
 #include "sensor.h"
 #include "max7456.h"
+#include "font.h"
 #include "request.h"
 
 //Workaround for http://gcc.gnu.org/bugzilla/show_bug.cgi?id=34734
@@ -45,6 +46,50 @@
 #undef PROGMEM
 #define PROGMEM __attribute__((section(".progmem.data")))
 #endif
+
+
+/*------------------------------------------------------------------------
+ *  Function	: request_init1
+ *  Purpose	: Primary request initialisation.
+ *  Method	: Handle primary serial or sensor request init.
+ *
+ *  To avoid compiler warnings, serial_request_init1() and
+ *  sensor_request_init1() are made public instead of static.
+ *
+ *  Returns	: Nothing.
+ *------------------------------------------------------------------------
+ */
+void
+request_init1(void)
+{
+#ifdef STANDALONE
+    sensor_request_init1();
+#else
+    serial_request_init1();
+#endif
+} /* request_init1() */
+
+
+/*------------------------------------------------------------------------
+ *  Function	: request_init2
+ *  Purpose	: Secundary request initialisation.
+ *  Method	: Handle secundary serial or sensor request init.
+ *
+ *  To avoid compiler warnings, serial_request_init2() and
+ *  sensor_request_init2() are made public instead of static.
+ *
+ *  Returns	: Nothing.
+ *------------------------------------------------------------------------
+ */
+void
+request_init2(void)
+{
+#ifdef STANDALONE
+    sensor_request_init2();
+#else
+    serial_request_init2();
+#endif
+} /* request_init2() */
 
 
 /*------------------------------------------------------------------------
@@ -70,7 +115,7 @@ void
 request(void)
 {
 #ifdef STANDALONE
-    sensor_request();
+    sensor_request(false);
 #else
     serial_request();
 #endif
@@ -83,31 +128,12 @@ request(void)
  *------------------------------------------------------------------------
  */
 
-#define ACK(msg)				\
-{						\
-    if (!silent) {				\
-	if (control2) {				\
-	    Serial.println();			\
-	    Serial.print(F((msg)));		\
-	}					\
-	if (control1) {				\
-	    Serial.write((byte)CONTROL_ACK);	\
-	}					\
-    }						\
-}
-
-#define NAK(msg)				\
-{						\
-    if (!silent) {				\
-	if (control2) {				\
-	    Serial.println();			\
-	    Serial.print(F((msg)));		\
-	}					\
-	if (control1) {				\
-	    Serial.write((byte)CONTROL_NAK);	\
-	}					\
-    }						\
-}
+#define INIT() \
+    init_parse(silent, control_msg, control_chr, &parse, &sent_soh);
+#define ACK(msg) \
+    send_control((msg), (byte)CONTROL_ACK, silent, control_msg, control_chr);
+#define NAK(msg) \
+    send_control((msg), (byte)CONTROL_NAK, silent, control_msg, control_chr);
 
 #ifndef NO_DEBUG
 #define DEBUG_FREEMEM()				\
@@ -120,22 +146,6 @@ request(void)
 #else
 #define DEBUG_FREEMEM() {}
 #endif
-
-#define INIT() 					\
-{						\
-    parse = PARSE_INIT;				\
-    if (!silent) {				\
-	if (control2) {				\
-	    Serial.println();			\
-	    DEBUG_FREEMEM();			\
-	    Serial.print(F("GSOSD>"));		\
-	}					\
-	if (control1) {				\
-	    Serial.write((byte)CONTROL_EOT);	\
-	    sent_soh = false;			\
-	}					\
-    }						\
-}
 
 #define BUFSIZE 	(15)	/* buffer size in bytes */
 #define MSG_E_INTERNAL	"<INTERNAL ERROR>"
@@ -154,6 +164,108 @@ typedef enum {	/* parser state */
     PARSE_LEN,	/* parsing data length */
     PARSE_DATA	/* parsing data */
 } parse_t;
+
+
+/*------------------------------------------------------------------------
+ *  Function	: init_parse
+ *  Purpose	: Initialise parser state.
+ *  Method	: Direct assingment of variables & write to serial.
+ *
+ *  Returns	: Nothing.
+ *------------------------------------------------------------------------
+ */
+static void
+init_parse(
+	bool 	silent,		/* whether to be silent */
+    	bool	control_msg,	/* whether to send control message */
+	bool 	control_chr,	/* whether to send control chars */
+	parse_t *parse,		/* current parser state */
+	bool 	*sent_soh)	/* whether to sent SOH char */
+{
+    *parse = PARSE_INIT;
+    if (!silent) {
+	if (control_msg) {
+	    Serial.println();
+	    DEBUG_FREEMEM();
+	    Serial.print(F("GSOSD>"));
+	}
+	if (control_chr) {
+	    Serial.write((byte)CONTROL_EOT);
+	    *sent_soh = false;
+	}
+    }
+} /* init_parse() */
+
+
+/*------------------------------------------------------------------------
+ *  Function	: serial_request_init1
+ *  Purpose	: Primary serial request initialisation.
+ *  Method	: None, this function is for symmetry only.
+ *
+ *  Returns	: Nothing.
+ *------------------------------------------------------------------------
+ */
+void
+serial_request_init1(void)
+{
+} /* serial_request_init1() */
+
+
+/*------------------------------------------------------------------------
+ *  Function	: serial_request_init2
+ *  Purpose	: Secundary serial request initialisation.
+ *  Method	: Write message and control characters to serial.
+ *
+ *  Returns	: Nothing.
+ *------------------------------------------------------------------------
+ */
+void
+serial_request_init2(void)
+{
+    bool	control_chr;	/* whether to send control characters */
+    bool	control_msg;	/* whether to send control messages */
+    parse_t 	p;		/* dummy variale */
+    bool 	s;		/* dummy variable */
+
+    if (!cfg_get_silent()) {
+        if ((control_chr = ((cfg_get_control() & 0x01) != 0x00))) {
+    	    Serial.write((byte)CONTROL_SOH);
+	}
+        if ((control_msg = ((cfg_get_control() & 0x02) != 0x00))) {
+	    Serial.print(F("Welcome to GS-OSD, version: "));
+	    Serial.println(cfg_get_version());
+	}
+        init_parse(false, control_msg, control_chr, &p, &s);
+    }
+} /* serial_request_init2() */
+
+
+/*------------------------------------------------------------------------
+ *  Function	: send_control
+ *  Purpose	: Send control-  message and/or character to serial.
+ *  Method	: Write to serial.
+ *
+ *  Returns	: Nothing.
+ *------------------------------------------------------------------------
+ */
+static void
+send_control(
+	const char 	*msg,		/* control msg to print to serial */
+	byte		chr,		/* control char to print to serial */
+	bool 		silent,		/* whether to be silent */
+    	bool		control_msg,	/* whether to send control message */
+	bool 		control_chr)	/* whether to send control chars */
+{
+    if (!silent) {
+	if (control_msg) {
+	    Serial.println();
+	    Serial.print(msg);
+	}
+	if (control_chr) {
+	    Serial.write(chr);
+	}
+    }
+} /* send_control() */
 
 
 /*------------------------------------------------------------------------
@@ -193,19 +305,22 @@ serial_request(void)
     static unsigned long 	time;		/* current time */
     int 			ch;		/* char received from serial */
     long long			intval;		/* big integer */
-    int 			j;		/* loop counter */
-    int 			avail;		/* serial available bytes */
+    uint8_t 			j;		/* loop counter */
+    uint8_t 			avail;		/* serial available bytes */
     bool			silent;		/* whether to be silent */
     bool			echo;		/* whether to echo input */
-    bool			control1;	/* whether to send control characters */
-    bool			control2;	/* whether to send control text */
-    static bool			sent_pause;	/* whether to requested transmission pause */
+    bool			control_chr;	/* whether to send control
+						   characters */
+    bool			control_msg;	/* whether to send control
+						   messages */
+    static bool			sent_pause;	/* whether to requested
+						   transmission pause */
     static bool			sent_soh;	/* whether sent SOH char */
 
     silent = cfg_get_silent();
     echo = !silent && cfg_get_echo();
-    control1 = !silent && cfg_get_control() & 0x01;
-    control2 = !silent && cfg_get_control() & 0x02;
+    control_chr = !silent && (cfg_get_control() & 0x01) != 0x00;
+    control_msg = !silent && (cfg_get_control() & 0x02) != 0x00;
     if (time != 0 && millis() - time > cfg_get_timeout()) {
 	time = 0;
 	i = 0;
@@ -213,7 +328,7 @@ serial_request(void)
 	INIT();
     }
     while ((avail = Serial.available()) > 0) {
-	if (control1) {
+	if (control_chr) {
 	    if (avail > 50) {
 	        if (avail >= 63) {
 		    Serial.write((byte)CONTROL_CAN);
@@ -288,14 +403,14 @@ serial_request(void)
 		if (j >= COMMAND_COUNT) {
 		    i = 0;
 		    NAK(MSG_E_SYNTAX);
-		    INIT();
+	            INIT();
 		    break;
 		}
 		cmdprops = &CMD_PROPS[j];
 		if (cmdprops->argc > NARGS) {
 		    i = 0;
 		    NAK(MSG_E_INTERNAL);
-		    INIT();
+	            INIT();
 		    break;
 		}
 		argi = 0;
@@ -311,7 +426,7 @@ serial_request(void)
 			NAK(MSG_E_FAIL);
 			/* fallthrough */
 		    } else ACK(MSG_OK);
-		    INIT();
+	            INIT();
 		}
 		i = 0;
 	    } else {
@@ -335,7 +450,7 @@ serial_request(void)
 		if (j < i || intval > INT32_MAX || intval < INT32_MIN) {
 		    NAK(MSG_E_ARG);
 		    i = 0;
-		    INIT();
+	            INIT();
 		    break;
 		}
 		args[argi++] = intval;
@@ -350,7 +465,7 @@ serial_request(void)
 			    NAK(MSG_E_FAIL);
 			    /* fallthrough */
 		    	} else ACK(MSG_OK);
-			INIT();
+	                INIT();
 		    }
 		}
 	    } else {
@@ -401,7 +516,7 @@ serial_request(void)
 		        NAK(MSG_E_FAIL);
 			time = 0;
 			i = 0;
-			INIT();
+	                INIT();
 			break;
 		    }
 		    i = 0;
@@ -432,7 +547,7 @@ serial_request(void)
     }
 
     /* input buffer should be empty */
-    if (control1 && sent_pause) {
+    if (control_chr && sent_pause) {
 	Serial.write((byte)CONTROL_DC1);
 	sent_pause = false;
     }
@@ -468,6 +583,14 @@ X(MI_CBL,            	"Character black level")		\
 X(MI_CWL,            	"Character white level")		\
 X(MI_INSMUX1,        	"Sharpness 1")				\
 X(MI_INSMUX2,        	"Sharpness 2")				\
+X(MI_FONT,        	"Font")					\
+X(MI_FONTEFFECT,       	"Font effect")				\
+X(MI_BORDER,   		"Black border")				\
+X(MI_SHADOW,   		"Shadow")				\
+X(MI_TRANSWHITE,     	"Trans/white")				\
+X(MI_BLACKWHITE,     	"Black/white")				\
+X(MI_INVERT,     	"Invert")				\
+X(MI_FONTRESET,        	"Font reset")				\
 X(MI_LAYOUT,		"Layout")				\
 X(MI_CALIBRATION,	"Calibration")				\
 X(MI_SCREEN,		"Screen")				\
@@ -595,6 +718,19 @@ menus_init(void)
 	{ MI_SENSOR3, 	&plusminus[0], 	NULL, 0 },
 	{ MI_NONE }
     };
+    static menu_t fonteffect[] = {
+	{ MI_BORDER,	&yesno[0], 	NULL, 1 },
+	{ MI_SHADOW,	&yesno[0], 	NULL, 1 },
+	{ MI_TRANSWHITE,&yesno[0], 	NULL, 1 },
+	{ MI_BLACKWHITE,&yesno[0], 	NULL, 1 },
+	{ MI_INVERT,	&yesno[0], 	NULL, 1 },
+	{ MI_NONE }
+    };
+    static menu_t font[] = {
+	{ MI_FONTRESET,	&yesno[0], 	NULL, 1 },
+	{ MI_FONTEFFECT,&fonteffect[0],	NULL, 0 },
+	{ MI_NONE }
+    };
     static menu_t screen[] = {
 	{ MI_ENABLE, 	&yesno[0], 	NULL, 0 },
 	{ MI_HOS, 	&plusminus[0], 	NULL, 0 },
@@ -603,6 +739,7 @@ menus_init(void)
 	{ MI_CWL, 	&plusminus[0], 	NULL, 0 },
 	{ MI_INSMUX1, 	&plusminus[0], 	NULL, 0 },
 	{ MI_INSMUX2, 	&plusminus[0], 	NULL, 0 },
+	{ MI_FONT,	&font[0], 	NULL, 0 },
 	{ MI_NONE }
     };
     static menu_t mainmenu[] = {
@@ -967,11 +1104,32 @@ adjust_element(
 		     * the menu becomes idle (in button_is_up()), but that
 		     * could take too long if the user turns off the power
 		     * earlier. Anyway, the second cfg_save() doesn't do much
-		     * as it only saves pending changes.
+		     * as it only saves pending changes; nothing in this case.
 		     */
 		    cfg_save(false);
 		}
 		*inv_enable = false;
+	    }
+	    if (act_flags & FLAG(MI_YES)) {
+	        if (act_flags & FLAG(MI_FONTRESET)) {
+		    cmd_font_reset(NULL);
+		}
+	        if (act_flags & FLAG(MI_FONTEFFECT)) {
+		    int32_t fonteffect = FE_NONE;
+
+	            if (act_flags & FLAG(MI_BORDER)) {
+			fonteffect = FE_BORDER;
+		    } else if (act_flags & FLAG(MI_SHADOW)) {
+			fonteffect = FE_SHADOW;
+		    } else if (act_flags & FLAG(MI_TRANSWHITE)) {
+			fonteffect = FE_TRANSWHITE;
+		    } else if (act_flags & FLAG(MI_BLACKWHITE)) {
+			fonteffect = FE_BLACKWHITE;
+		    } else if (act_flags & FLAG(MI_INVERT)) {
+			fonteffect = FE_INVERT;
+		    }
+		    cmd_font_effect(&fonteffect);
+		}
 	    }
 	    break;
 	}
@@ -1409,7 +1567,7 @@ is_any_sensor_low(
  *  		  the OSD. Control can be done with single push button.
  *  Method	: Store ids of sensors that are currently high.
  *
- *  Returns	: Array ending with SENSOR_NONE.
+ *  Returns	: Static array ending with SENSOR_NONE.
  *------------------------------------------------------------------------
  */
 static sensor_t *
@@ -1433,10 +1591,65 @@ control_init()
 	sensors[num + 1] = SENSOR_NONE;
 	if (!is_any_sensor_low(sensors + num)) {
 	    num++;
+	} else {
+	    sensors[num] = SENSOR_NONE;	/* fix last value */
 	}
     }
     return sensors;
 } /* control_init() */
+
+
+/*------------------------------------------------------------------------
+ *  Function	: sensor_count
+ *  Purpose	: Count number of usable sensors.
+ *  Method	: Check array contents.
+ *
+ *  Returns	: Number of usable sensors to control the OSD.
+ *------------------------------------------------------------------------
+ */
+static uint8_t
+sensor_count(
+	sensor_t *sensors)	/* usable sensors to test */
+{
+    uint8_t i = 0;
+
+    while (sensors[i] != SENSOR_NONE) {
+	i++;
+    }
+    return i;
+} /* sensor_count() */
+
+
+/*------------------------------------------------------------------------
+ *  Function	: sensor_request_init1
+ *  Purpose	: Primary sensor request initialisation.
+ *  Method	: Call sensor_request() for the first time so that it
+ *  		  initialises its static data.
+ *
+ *  Returns	: Nothing.
+ *------------------------------------------------------------------------
+ */
+void
+sensor_request_init1(void)
+{
+    sensor_request(false);
+} /* sensor_request_init1() */
+
+
+/*------------------------------------------------------------------------
+ *  Function	: sensor_request_init2
+ *  Purpose	: Secundary sensor request initialisation.
+ *  Method	: Call sensor_request() for the second time while requesting
+ *  		  to check for font reset.
+ *
+ *  Returns	: Nothing.
+ *------------------------------------------------------------------------
+ */
+void
+sensor_request_init2(void)
+{
+    sensor_request(true);
+} /* sensor_request_init2() */
 
 
 /*------------------------------------------------------------------------
@@ -1448,7 +1661,8 @@ control_init()
  *------------------------------------------------------------------------
  */
 void
-sensor_request(void)
+sensor_request(
+	bool	check_fontreset)	/* whether to check for font reset */
 {
 #define PRINTTIME 100
 #define BOUNCETIME 50
@@ -1471,7 +1685,6 @@ sensor_request(void)
     }
     if (sensors == NULL) {
 	sensors = control_init();
-
 	/*
 	 * Cache sensor values to allow calibration to be the first menu.
 	 * Otherwise, if the button is held down until calibration of first
@@ -1479,6 +1692,22 @@ sensor_request(void)
 	 * See button_goes_up() for more info.
 	 */
 	read_sensors(values);
+    }
+    if (check_fontreset && sensors != NULL) {
+	uint8_t count;	/* number of usable sensors during previous call */
+
+	/*
+	 * Count the number of usable sensors to detect font reset sequence
+	 * at startup. Resetting the font is done by holding a button down
+	 * while starting up, and releasing it within a certain amount of
+	 * time. If the number increases, a button was held down during
+	 * startup, for which we reset the font. This can be used to load
+	 * the font after installing GSOSD or when font is broken/empty.
+	 * For those cases we can't use the menu to reset the font.
+	 */
+	count = sensor_count(sensors);
+	sensors = control_init();
+	if (count < sensor_count(sensors)) cmd_font_reset(NULL);
     }
 
     /*

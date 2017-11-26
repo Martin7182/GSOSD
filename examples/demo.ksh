@@ -295,7 +295,7 @@ for i in {1..100}; do
     y=$RANDOM
     let "y %= $rangey"
     printf " P_RAW $x $y 10 GAME OVER!" >$OUT
-    let "sleeptime /= 1.1"
+    sleeptime=$(print "scale=3\n $sleeptime / 1.1" | bc)
     sleep $sleeptime
     printf " CLEARPART $x $y 10 1 " | throttle $MAX >$OUT
 done

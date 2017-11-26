@@ -55,7 +55,7 @@ const uint16_t CFG_SIZES[] PROGMEM = {
 };
 #undef X
 
-str16_t 	VERSION = "GSOSD 1.1.0";	/* current version */
+str16_t 	VERSION = "GSOSD 1.2.0";	/* current version */
 configdata_t 	configdata;			/* configurable parameters */
 
 /* X-macro generating local prototypes. */
@@ -308,7 +308,7 @@ cfg_dump(void)
     char 	buf[CFG_SIZE];	/* buffer for PROGMEM strings */
     bool 	stx = false; 	/* whether STX printed */
 
-    if (!cfg_get_silent() && cfg_get_control() & 0x01) {
+    if (!cfg_get_silent() && (cfg_get_control() & 0x01) != 0x00) {
         Serial.write((byte)CONTROL_STX);
 	stx = true;
     }
