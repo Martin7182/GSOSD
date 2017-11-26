@@ -24,13 +24,14 @@
 #
 #=========================================================================
 
-if ($argc < 2) {
-    fprintf(STDERR, "Expecting gif image file as first argument.\n");
+if ($argc < 3) {
+    fprintf(STDERR, "Expecting gif image file as first argument and format as second argument; 1=MWOSD, 2=GSOSD-serial, 3=GSOSD-hardcoded.\n");
     exit(1);
 }
 // format 1: MWOSD format
-// format 2: GSOSD format
-$format = 2;
+// format 2: GSOSD format for serial input
+// format 3: GSOSD format for hard-coded development
+$format = $argv[2];
 
 $gifimg = $argv[1];
 $im = @imagecreatefromgif($gifimg);
@@ -52,6 +53,7 @@ $format == 1 && printf("MAX7456\n");
 $pc = 0; 	// no pixels stored yet
 $byte = 0x00;	// output byte
 $bi = 0;	// bit index in $byte
+$bytec = 0;	// bytes written per character
 
 // The NVM contains 256 rows of 64 bytes i.e. 512 bits per character; 432 data
 // bits followed by 80 unused bits. The order of pixels is from top to bottom
@@ -83,29 +85,51 @@ for ($cy = 0; $cy < 16; $cy++) {
 		    // set white pixel
 		    $byte |= (1 << (7 - $bi));
 		} else {
-		    // Bad runtime performance doesn't really matter.
-		    // Remembering the last value would be faster.
-		    if (($cpx == 0
-		            || imagecolorat($im, $ipx - 1, $ipy) != 0)
-		        && ($cpx == 11
-			    || imagecolorat($im, $ipx + 1, $ipy) != 0)
-		        && ($cpy == 0
-			    || imagecolorat($im, $ipx, $ipy - 1) != 0)
-		        && ($cpy == 17
-			    || imagecolorat($im, $ipx, $ipy + 1) != 0)) {
-			// set transparent pixel at minimal distance 1 from character pixels,
-			// all pixels directly next to character pixels remain black.
-			$byte |= (1 << (6 - $bi));
+		    if ($format == 1 || $format == 2) {
+			// Bad runtime performance doesn't really matter.
+			// Remembering the last value would be faster.
+			if (($cpx == 0
+				|| imagecolorat($im, $ipx - 1, $ipy) != 0)
+			    && ($cpx == 11
+				|| imagecolorat($im, $ipx + 1, $ipy) != 0)
+			    && ($cpy == 0
+				|| imagecolorat($im, $ipx, $ipy - 1) != 0)
+			    && ($cpy == 17
+				|| imagecolorat($im, $ipx, $ipy + 1) != 0)) {
+			    // set transparent pixel at minimal distance 1 from
+			    // character pixels, all pixels directly next to
+			    // character pixels remain black.
+			    $byte |= (1 << (6 - $bi));
+			}
 		    }
 		}
 		$pc++;
-		$bi += 2;
+		if ($format == 3) {
+		    $bi++;
+		} else {
+		    $bi += 2;
+		}
 		if ($bi == 8) {
-		    if ($format == 2) {
+		    $bytec++;
+		    if ($format == 1) {
+			printf("%08d\n", decbin($byte));
+		    } else if ($format == 2) {
 			printf(" %08d", decbin($byte));
-		    } else if ($format == 1) {
-		    } else {
-			printf("%c", $byte);
+		    } else if ($format == 3) {
+			if ($bytec == 1) {
+			    printf("{ ");
+			} else if ($bytec == 15) {
+			    printf("  ");
+			}
+			printf("0x%02X", $byte);
+			if ($bytec != 27) {
+			    printf(",");
+			} else {
+			    printf(" },\n");
+			}
+			if ($bytec == 14) {
+			    printf("\n");
+			}
 		    }
 		    $byte = 0x00;
 		    $bi = 0;
@@ -116,11 +140,7 @@ for ($cy = 0; $cy < 16; $cy++) {
 		if ($format == 1 && $pc % 216 == 0) {
 		    $byte = 0x55;
 		    for ($i = 0; $i < 10; $i++) {
-		        if ($format == 1) {
-			    printf("%08d\n", decbin($byte));
-			} else {
-			    printf("%c", $byte);
-			}
+		        printf("%08d\n", decbin($byte));
 		    }
 		}
 	    }
@@ -128,6 +148,7 @@ for ($cy = 0; $cy < 16; $cy++) {
 	if ($format == 2) {
 	    printf("\n");
 	}
+	$bytec = 0;
     }
 }
 

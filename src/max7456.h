@@ -31,52 +31,52 @@
 
 #define FONTBUF_SIZE 	(54)		/* font buffer size in bytes */
 
-typedef char fontbuf_t[FONTBUF_SIZE];	/* buffer to hold one font character */
+typedef uint8_t fontbuf_t[FONTBUF_SIZE];/* buffer to hold one font character */
 
 /* A list of all Max7456 registers. */
 /* Read/write registers. */
-/* addr	key	name				default	restore_eeprom	*/
-#define REG_MAP_RW							\
-X(0x80, VM0,   "Video Mode 0",			0x08,	true)		\
-X(0x81, VM1,   "Video Mode 1",			0x47,	true)		\
-X(0x82, HOS,   "Horizontal Offset",		0x20,	true)		\
-X(0x83, VOS,   "Vertical Offset",		0x10,	true)		\
-X(0x84, DMM,   "Display Memory Mode",		0x00,	false)		\
-X(0x85, DMAH,  "Display Memory Address High",	0x00,	false)		\
-X(0x86, DMAL,  "Display Memory Address Low",	0x00,	false)		\
-X(0x87, DMDI,  "Display Memory Data In",	0x00,	false)		\
-X(0x88, CMM,   "Character Memory Mode",		0x00,	false)		\
-X(0x89, CMAH,  "Character Memory Address High",	0x00,	false)		\
-X(0x8A, CMAL,  "Character Memory Address Low",	0x00,	false)		\
-X(0x8B, CMDI,  "Character Memory Data In",	0x00,	false)		\
-X(0x8C, OSDM,  "OSD Insertion Mux",		0x1B,	true)		\
-X(0x90, RB0,   "Row 0 Brightness",		0x01,	true)		\
-X(0x91, RB1,   "Row 1 Brightness",		0x01,	true)		\
-X(0x92, RB2,   "Row 2 Brightness",		0x01,	true)		\
-X(0x93, RB3,   "Row 3 Brightness",		0x01,	true)		\
-X(0x94, RB4,   "Row 4 Brightness",		0x01,	true)		\
-X(0x95, RB5,   "Row 5 Brightness",		0x01,	true)		\
-X(0x96, RB6,   "Row 6 Brightness",		0x01,	true)		\
-X(0x97, RB7,   "Row 7 Brightness",		0x01,	true)		\
-X(0x98, RB8,   "Row 8 Brightness",		0x01,	true)		\
-X(0x99, RB9,   "Row 9 Brightness",		0x01,	true)		\
-X(0x9A, RB10,  "Row 10 Brightness",		0x01,	true)		\
-X(0x9B, RB11,  "Row 11 Brightness",		0x01,	true)		\
-X(0x9C, RB12,  "Row 12 Brightness",		0x01,	true)		\
-X(0x9D, RB13,  "Row 13 Brightness",		0x01,	true)		\
-X(0x9E, RB14,  "Row 14 Brightness",		0x01,	true)		\
-X(0x9F, RB15,  "Row 15 Brightness",		0x01,	true)		\
-X(0xEC, OSDBL, "OSD Black Level",		0x10,	false)		\
+/* addr	key	name				def   eeprom stat   dmm      */
+#define REG_MAP_RW							      \
+X(0x80, VM0,   "Video Mode 0",			0x08, true,  true,  true)     \
+X(0x81, VM1,   "Video Mode 1",			0x47, true,  false, false)    \
+X(0x82, HOS,   "Horizontal Offset",		0x20, true,  false, false)    \
+X(0x83, VOS,   "Vertical Offset",		0x10, true,  false, false)    \
+X(0x84, DMM,   "Display Memory Mode",		0x00, false, false, true)     \
+X(0x85, DMAH,  "Display Memory Address High",	0x00, false, false, true)     \
+X(0x86, DMAL,  "Display Memory Address Low",	0x00, false, false, true)     \
+X(0x87, DMDI,  "Display Memory Data In",	0x00, false, false, true)     \
+X(0x88, CMM,   "Character Memory Mode",		0x00, false, true,  false)    \
+X(0x89, CMAH,  "Character Memory Address High",	0x00, false, true,  false)    \
+X(0x8A, CMAL,  "Character Memory Address Low",	0x00, false, true,  false)    \
+X(0x8B, CMDI,  "Character Memory Data In",	0x00, false, true,  false)    \
+X(0x8C, OSDM,  "OSD Insertion Mux",		0x1B, true,  false, false)    \
+X(0x90, RB0,   "Row 0 Brightness",		0x01, true,  false, false)    \
+X(0x91, RB1,   "Row 1 Brightness",		0x01, true,  false, false)    \
+X(0x92, RB2,   "Row 2 Brightness",		0x01, true,  false, false)    \
+X(0x93, RB3,   "Row 3 Brightness",		0x01, true,  false, false)    \
+X(0x94, RB4,   "Row 4 Brightness",		0x01, true,  false, false)    \
+X(0x95, RB5,   "Row 5 Brightness",		0x01, true,  false, false)    \
+X(0x96, RB6,   "Row 6 Brightness",		0x01, true,  false, false)    \
+X(0x97, RB7,   "Row 7 Brightness",		0x01, true,  false, false)    \
+X(0x98, RB8,   "Row 8 Brightness",		0x01, true,  false, false)    \
+X(0x99, RB9,   "Row 9 Brightness",		0x01, true,  false, false)    \
+X(0x9A, RB10,  "Row 10 Brightness",		0x01, true,  false, false)    \
+X(0x9B, RB11,  "Row 11 Brightness",		0x01, true,  false, false)    \
+X(0x9C, RB12,  "Row 12 Brightness",		0x01, true,  false, false)    \
+X(0x9D, RB13,  "Row 13 Brightness",		0x01, true,  false, false)    \
+X(0x9E, RB14,  "Row 14 Brightness",		0x01, true,  false, false)    \
+X(0x9F, RB15,  "Row 15 Brightness",		0x01, true,  false, false)    \
+X(0xEC, OSDBL, "OSD Black Level",		0x10, false, false, false)    \
 
 /* Readonly registers. */
-/* addr	key	name							*/
-#define REG_MAP_R							\
-X(0xAF, STAT,  "Status")						\
-X(0xBF, DMDO,  "Display Memory Data Out")				\
-X(0xCF, CMDO,  "Character Memory Data Out")				\
+/* addr	key	name							     */
+#define REG_MAP_R							      \
+X(0xAF, STAT,  "Status")						      \
+X(0xBF, DMDO,  "Display Memory Data Out")				      \
+X(0xCF, CMDO,  "Character Memory Data Out")				      \
 
 /* X-macro generating the number of writeable registers */
-#define X(addr, key, name, def, save_eeprom) key,
+#define X(addr, key, name, def, save_eeprom, wait_stat, wait_dmm) key,
 typedef enum regw_count_t {
     REG_MAP_RW
     REGW_COUNT

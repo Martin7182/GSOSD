@@ -1,5 +1,5 @@
 /*========================================================================
- *  Copyright (c) 2016 Martin7182
+ *  Copyright (c) 2017 Martin7182
  *
  *  This file is part of GSOSD.
  *
@@ -16,31 +16,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with GSOSD.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  File	: request.h
- *  Purpose	: Declarations for request handling routines.
+ *  File	: font.h
+ *  Purpose	: Declarations for font handling.
  *  Author(s)	: Martin7182
- *  Creation	: 2016/05/27
+ *  Creation	: 2017/10/16
  *
  *========================================================================
  */
 
-#ifndef REQUEST_H
-#define REQUEST_H
+#ifndef FONT_H
+#define FONT_H
 
-/*
- * serial_request...() and sensor_request...() are made public to avoid
- * compiler warning: ‘void ..._request...()’ defined but not used.
- * See request.cpp for more info.
- */
-void serial_request_init1(void);
-void sensor_request_init1(void);
-void request_init1(void);
-void serial_request_init2(void);
-void sensor_request_init2(void);
-void request_init2(void);
-void serial_request(void);
-void sensor_request(bool);
-void request();
+typedef enum {		/* possible font effects on currently loaded font */
+    FE_BORDER = 0,	/* black border */
+    FE_SHADOW,		/* shadow */
+    FE_TRANSWHITE,	/* don't use black pixels */
+    FE_BLACKWHITE,	/* don't use transparent pixels */
+    FE_INVERT,		/* invert black/white pixels */
+    FE_NONE,		/* none */
+} fonteffect_t, *fonteffect_p;
 
-#endif /* REQUEST_H */
+bool font_apply(fonteffect_p);
+
+#endif /* FONT_H */
 

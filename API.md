@@ -44,6 +44,8 @@ An overview of basic commands is shown below. 'argc' is the number of arguments 
 | P_RAW	  	| 4 	| Y	| print raw data to screen
 | P_WINDOW	| 6  	| Y	| print window with data
 | P_BANNER	| 6  	| Y	| print banner with data
+| FONT_EFFECT	| 1 	| N	| apply effect to font characters
+| FONT_RESET	| 0 	| N	| reset all font characters to default
 | SET_FONT	| 3 	| Y	| upload font character to internal storage
 | GET_FONT	| 1 	| N	| show font character to serial
 | GET_SENSOR	| 1 	| N	| get sensor voltage
@@ -339,6 +341,31 @@ Example :	`P_BANNER 9 5 9 1 27 .........Catch me!.........`
 
 ----
 
+**FONT_EFFECT**
+Purpose	: 	Apply effect to all font characters.
+Arguments :	*effect-id* (integer)  
+
+This command applies an effect to the stored font characters. The operation is irreversible in the sense that you cannot undo certain effects with FONT_EFFECT itself (but only with FONT_RESET or SET_FONT). For example effect 2 (set black to transparent) combined with 4 (set white to black and vice versa) and 3 (set transparent to black, makes all pixels black.
+
+Examples :  
+`FONT_EFFECT 0`  // set black border
+`FONT_EFFECT 1`  // set shadow
+`FONT_EFFECT 2`  // white/transparent pixels only
+`FONT_EFFECT 3`  // black/white pixels only
+`FONT_EFFECT 4`  // invert black/white pixels
+
+----
+
+**FONT_RESET**
+Purpose	: 	Reset all font characters.
+Arguments :	none
+
+This command resets all font characters to the inbuilt GSOSD font. This can be used to load the initial font. Note that a typical MinimOSD comes from the factory with a Chinese font. The operation is irreversible; it completely overwrites the current font. Functionally it does exactly the same as the 256 SET_FONT instructions of script fonts/minimosd.osd.
+
+Example :	`FONT_RESET`  
+
+----
+
 **SET_FONT**  
 Purpose	: 	Set font character.  
 Arguments :  
@@ -499,7 +526,7 @@ Type : 		32 bits integer value
 Range :		0 - 4G  
 Default :	2000  
 
-At startup a logo will be displayed if this setting is non-zero, for the configured number of milliseconds. The logo has 12 characters width and 2 characters height and can be configured by changing font characters 0x80 - 0x8B and 0x90 - 0x9B.
+At startup a logo will be displayed if this setting is non-zero, for the configured number of milliseconds. The logo has 12 characters width and 2 characters height and can be configured by changing font characters 0x80 - 0x8B and 0x90 - 0x9B. At startup of the stand alone version of GSOSD, the font can be reset by holding the control button down while powering on and releasing it while the logo is visible.
 
 Examples :  
 `GET_LOGO`  

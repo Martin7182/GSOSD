@@ -29,12 +29,13 @@ Quick start guide
 4. Click verify and then upload.
 5. Start Serial Monitor with 9600 baud. You should see the GSOSD welcome message.
 6. Type "LIST" followed by enter or space. This shows a list of available commands.
-7. You can try to print something on the screen, e.g. with command "P_RAW 9 6 12 Hello world!". By default, the text should be visible. If not, try command "RESET" followed by "SET_ENABLE 1".
+7. Load the default font with command "FONT_RESET".
+8. You can now try to print something on the screen, e.g. with command "P_RAW 9 6 12 Hello world!". By default, the text should be visible. If not, try command "RESET" followed by "SET_ENABLE 1".
 
 
 Font characters
 ---------------
-By default many Micro MinimOSDs come with a small part of the ASCII character set (only numbers and capitals) and some Chinese characters in the higher character range. This doesn't do the job for western folks. A basic ASCII font can be found in the font directory, along with the steps to upload it. If you want a different font, don't mess around with a pixel editor, but take a look at the scripts in the font directory. Using free standard tools and some patience you'll generate any font in no time :-) In any case, you don't need special software to upload/download font characters. Simply use the SET_FONT/GET_FONT commands to handle characters one by one.
+By default many Micro MinimOSDs come with a small part of the ASCII character set (only numbers and capitals) and some Chinese characters in the higher character range. This doesn't do the job for western folks. A basic ASCII font can be found in the font directory, along with the steps to upload it. If you want a different font, don't mess around with a pixel editor, but take a look at the scripts in the font directory. Using free standard tools and some patience you'll generate any font in no time :-) In any case, you don't need special software to upload/download font characters. Simply use the SET_FONT/GET_FONT commands to handle characters one by one. Or use FONT_RESET to activate the inbuilt hard-coded font. For more info see [fonts/README.md](fonts/README.md)
 
 
 Testing & debugging
@@ -98,3 +99,4 @@ Version information
 - 1.1.0	Stand alone version.
 	- Control standalone/serial operation using compiler option.
         - Control serial debugging output using compiler option.
+- 1.2.0	Added font- reset and effects.

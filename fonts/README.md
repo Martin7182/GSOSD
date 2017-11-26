@@ -36,4 +36,45 @@ A new font file is simply a GSOSD script consisting of 256 SET_FONT instructions
 - Optionally, define window borders and logo (see above).  
 - Save the image in native format (so that you can edit it later if needed).  
 - Save the image in gif layout.  
-- Run gif2osd.php \<gif-file\>. The output is plain text that can be processed directly by GSOSD.  
+- Run command "gif2osd.php \<gif-file\> 2". The output is plain text that can be processed directly by GSOSD.  
+- If you want to hard-code this font in the program sources, use a "3" instead of "2" as second parameter for gifosd.php. And copy/paste the output into src/font.cpp. Note that this defines white character pixels only. When resetting the font using command FONT_RESET, the 'black border' effect is applied by default. Other effects can be activated using command FONT_EFFECT.  
+
+
+Font effect examples
+====================
+
+Border (default at reset)
+------------------------
+![abc_border.gif](../images/abc_border.gif)
+
+Shadow
+------
+![abc_shadow.gif](../images/abc_shadow.gif)
+
+Trans/white
+-----------------
+![abc_transwhite.gif](../images/abc_transwhite.gif)
+
+Black/white
+-----------
+![abc_blackwhite.gif](../images/abc_blackwhite.gif)
+
+Border + invert
+--------------
+![abc_border_invert.gif](../images/abc_border_invert.gif)
+
+Shadow + invert
+---------------
+![abc_shadow_invert.gif](../images/abc_shadow_invert.gif)
+
+Trans/white + invert
+--------------------------
+![abc_transwhite_invert.gif](../images/abc_transwhite_invert.gif)
+
+Black/white + invert
+--------------------
+![abc_blackwhite_invert.gif](../images/abc_blackwhite_invert.gif)
+
+Trans/white + invert + trans/white
+----------------------------------------------
+![abc_transwhite_invert_transwhite.gif](../images/abc_transwhite_invert_transwhite.gif)

@@ -53,11 +53,11 @@ Menu structure
 Menu **main**:
 
 | menu-item     | description
-|---------------|-------------------------------------------------
-| "Layout"      | set elements x and y positions on screen
-| "Calibration" | calibrate sensor inputs
-| "Screen"      | general screen settings
-| "About"       | show details about this software
+|---------------|-r----------------------------------------------
+| "Layout"      | Set elements x and y positions on screen.
+| "Calibration" | Calibrate sensor inputs.
+| "Screen"      | General screen settings.
+| "About"       | Show details about this software.
 
 ----
 
@@ -65,11 +65,11 @@ Menu **main->layout**:
 
 | menu-item     | description
 |---------------|-------------------------------------------------
-| "Sensor0"	| set sensor 0 (VBAT1) appearance
-| "Sensor1"	| set sensor 1 (VBAT2) appearance
-| "Sensor2"	| set sensor 2 (RSSI) appearance
-| "Sensor3"	| set sensor 3 (CURR) appearance
-| "Runtime"	| set runtime appearance
+| "Sensor0"	| Set sensor 0 (VBAT1) appearance.
+| "Sensor1"	| Set sensor 1 (VBAT2) appearance.
+| "Sensor2"	| Set sensor 2 (RSSI) appearance.
+| "Sensor3"	| Set sensor 3 (CURR) appearance.
+| "Runtime"	| Set runtime appearance.
 
 ----
 
@@ -77,8 +77,8 @@ Menu **main->layout->item(sensor0, sensor1, sensor2, sensor3, runtime)**:
 
 | menu-item     | description
 |---------------|-------------------------------------------------
-| "Visible"	| show value
-| "Invisible"	| hide value
+| "Visible"	| Show value.
+| "Invisible"	| Hide value.
 
 ----
 
@@ -86,8 +86,8 @@ Menu **main->layout->item->visible**:
 
 | menu-item     | description
 |---------------|-------------------------------------------------
-| "Horizontal"	| adjust horizontal position
-| "Vertical"	| adjust vertical position
+| "Horizontal"	| Adjust horizontal position.
+| "Vertical"	| Adjust vertical position.
 
 ----
 
@@ -95,8 +95,8 @@ Menu **main->layout->item->visible->item(horizontal, vertical)**:
 
 | menu-item     | description
 |---------------|-------------------------------------------------
-| "+"		| next column (hor) or row (ver)
-| "-"		| previous column (hor) or row (ver)
+| "+"		| Next column (hor) or row (ver).
+| "-"		| Previous column (hor) or row (ver).
 
 ----
 
@@ -104,10 +104,10 @@ Menu **main->calibration**:
 
 | menu-item     | description
 |---------------|-------------------------------------------------
-| "Sensor0"	| calibrate sensor 0 (VBAT1)
-| "Sensor1"	| calibrate sensor 1 (VBAT2)
-| "Sensor2"	| calibrate sensor 2 (RSSI)
-| "Sensor3"	| calibrate sensor 3 (CURR)
+| "Sensor0"	| Calibrate sensor 0 (VBAT1).
+| "Sensor1"	| Calibrate sensor 1 (VBAT2).
+| "Sensor2"	| Calibrate sensor 2 (RSSI).
+| "Sensor3"	| Calibrate sensor 3 (CURR).
 
 ----
 
@@ -115,8 +115,8 @@ Menu **main->calibration->item(sensor0, sensor1, sensor2, sensor3)**:
 
 | menu-item     | description
 |---------------|-------------------------------------------------
-| "+"		| add 0.01V (normal rate) or 0.1V (fast rate)
-| "-"		| subtract 0.01V (normal rate) or 0.1V (fast rate)
+| "+"		| Add 0.01V (normal rate) or 0.1V (fast rate).
+| "-"		| Subtract 0.01V (normal rate) or 0.1V (fast rate).
 
 ----
 
@@ -124,13 +124,14 @@ Menu **main->screen**:
 
 | menu-item               | description
 |-------------------------|-------------------------------------------------
-| "Enable"	          | turn OSD on or off instantly and at startup
-| "Horizontal offset"     | adjust horizontal offset
-| "Vertical offset"       | adjust vertical offset
-| "Character black level" | adjust character black level
-| "Character white level" | adjust character white level
-| "Sharpness 1"      	  | adjust rise and fall time
-| "Sharpness 2"	          | adjust insertion mux switching time
+| "Enable"	          | Turn OSD on or off instantly and at startup.
+| "Horizontal offset"     | Adjust horizontal offset.
+| "Vertical offset"       | Adjust vertical offset.
+| "Character black level" | Adjust character black level.
+| "Character white level" | Adjust character white level.
+| "Sharpness 1"      	  | Adjust rise and fall time.
+| "Sharpness 2"	          | Adjust insertion mux switching time.
+| "Font"	          | Font handling.
 
 ----
 
@@ -138,8 +139,8 @@ Menu **main->screen->enable**:
 
 | menu-item     | description
 |---------------|-------------------------------------------------
-| "Yes"		| turn OSD on at startup
-| "No"		| turn OSD off instantly and at startup
+| "Yes"		| Turn OSD on at startup.
+| "No"		| Turn OSD off instantly and at startup.
 
 ----
 
@@ -147,6 +148,50 @@ Menu **main->screen->item(hos, vos, cbl,cwl, insmux1, insmux2)**:
 
 | menu-item     | description
 |---------------|-------------------------------------------------
-| "+"		|	choose next value
-| "-"		|	choose previous value
+| "+"		| Choose next value.
+| "-"		| Choose previous value.
+
+----
+
+Menu **main->screen->font**:
+
+| menu-item     | description
+|---------------|-------------------------------------------------
+| "Font reset"  | Reset font characters (irreversible).
+| "Font effect" | Apply effect on current font characters (irreversible).
+
+----
+
+Menu **main->screen->font->fontreset**:
+
+| menu-item     | description
+|---------------|-------------------------------------------------
+| "Yes"		| Reset all font characters to default (irreversible).
+| "No"		| Cancel.
+
+----
+
+Menu **main->screen->font->fonteffect**:
+
+| menu-item     | description
+|---------------|-------------------------------------------------
+| "Border"	| Set black border around white pixels.
+| "Shadow"	| Set black borrder but only at the right and bottom.
+| "Trans/white"	| Don't use black pixels.
+| "Black/white"	| Don't use transparent pixels.
+| "Invert"	| Invert black/white pixels.
+
+----
+
+Menu **main->screen->font->item(border, shadow, transwhite, blackwhite, invert)**:
+
+| menu-item     | description
+|---------------|-------------------------------------------------
+| "Yes"		| Apply the effect (irreversible).
+| "No"		| Cancel.
+
+
+Resetting the font without menu
+-------------------------------
+If you messed up the font so that it became unreadable or empty, an alternative way to reset it is to power up while holding the control button down. Then, release the button while the startup logo is or should be visible. At startup there is a two seconds delay, so your best bet is to release the button right after that. It also depends on the logo display time (which is two seconds by default).
 
