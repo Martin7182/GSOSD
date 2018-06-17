@@ -53,7 +53,7 @@ Menu structure
 Menu **main**:
 
 | menu-item     | description
-|---------------|-r----------------------------------------------
+|---------------|------------------------------------------------
 | "Layout"      | Set elements x and y positions on screen.
 | "Calibration" | Calibrate sensor inputs.
 | "Screen"      | General screen settings.
